@@ -12,6 +12,7 @@
     <modules>
         <module>common</module>
         <module>coupon</module>
+        <module>gateway</module>
         <module>member</module>
         <module>order</module>
         <module>product</module>

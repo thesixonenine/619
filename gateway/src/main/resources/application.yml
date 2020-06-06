@@ -1,0 +1,10 @@
+spring:
+  cloud:
+    gateway:
+      routes:
+      - id: path_roo_baidu_route
+        uri: https://www.baidu.com
+        # 断言规则
+        predicates:
+        - Path=/
+#        - Path=/reset/{segment},/{segment}
