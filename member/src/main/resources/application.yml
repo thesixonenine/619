@@ -1,9 +1,16 @@
 spring:
+  application:
+    name: member
   datasource:
     url: jdbc:mysql://192.168.137.10:3306/ums?useUnicode=true&characterEncoding=UTF-8&useSSL=false&serverTimezone=Asia/Shanghai
     username: root
     password: 123456
     driver-class-name: com.mysql.cj.jdbc.Driver
+  cloud:
+    nacos:
+      discovery:
+        # 默认值
+        server-addr: 127.0.0.1:8848
 mybatis-plus:
   # 默认值
   mapper-locations: classpath:/mapper/**/*.xml
