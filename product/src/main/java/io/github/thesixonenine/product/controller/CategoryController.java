@@ -1,9 +1,11 @@
 package io.github.thesixonenine.product.controller;
 
 import java.util.Arrays;
+import java.util.List;
 import java.util.Map;
 
 // import org.apache.shiro.authz.annotation.RequiresPermissions;
+import io.github.thesixonenine.product.dto.CategoryDTO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -29,6 +31,16 @@ import io.github.thesixonenine.common.utils.R;
 public class CategoryController {
     @Autowired
     private CategoryService categoryService;
+
+    /**
+     * 学习部分
+     */
+
+    @RequestMapping("/listTree")
+    public R listTree() {
+        List<CategoryDTO> list = categoryService.listTree();
+        return R.ok().put("data", list);
+    }
 
     /**
      * 列表

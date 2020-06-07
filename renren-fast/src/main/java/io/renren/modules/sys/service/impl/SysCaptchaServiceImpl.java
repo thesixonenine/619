@@ -40,8 +40,9 @@ public class SysCaptchaServiceImpl extends ServiceImpl<SysCaptchaDao, SysCaptcha
             throw new RRException("uuid不能为空");
         }
         //生成文字验证码
-        String code = producer.createText();
-
+        // String code = producer.createText();
+        // 验证码写死为 1
+        String code = "1";
         SysCaptchaEntity captchaEntity = new SysCaptchaEntity();
         captchaEntity.setUuid(uuid);
         captchaEntity.setCode(code);

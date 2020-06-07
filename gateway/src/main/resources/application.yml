@@ -7,4 +7,19 @@ spring:
         # 断言规则
         predicates:
         - Path=/
-#        - Path=/reset/{segment},/{segment}
+        # - Path=/reset/{segment},/{segment}
+      - id: admin_product_route
+        uri: lb://product
+        predicates:
+        - Path=/renren-fast/product/**
+        filters:
+        - RewritePath=/renren-fast(?<segment>/?.*), $\{segment}
+
+      - id: admin_route
+        uri: lb://renren-fast
+        predicates:
+        # /red/1 or /red/blue or /blue/green
+        # - Path=/red/{segment},/blue/{segment}
+        - Path=/renren-fast/**
+        # filters:
+        # - RewritePath=/renren-fast(?<segment>/?.*), $\{segment}
