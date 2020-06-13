@@ -13,3 +13,14 @@ mybatis-plus:
       id-type: auto
 server:
   port: 10000
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: '*'
+  endpoint:
+    health:
+      show-details: ALWAYS
+logging:
+  file: C:\Users\Simple\Documents\CATALINA.BASE\619\${spring.application.name}.txt

@@ -1,8 +1,12 @@
 spring:
   application:
     name: renren-fast
-#  cloud:
-#    nacos:
+  cloud:
+    nacos:
+      discovery:
+        metadata:
+          management:
+            context-path: ${server.servlet.context-path}/actuator
       # 默认值
 #      server-addr: 127.0.0.1:8848
 #      discovery:

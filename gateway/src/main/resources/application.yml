@@ -23,3 +23,16 @@ spring:
         - Path=/renren-fast/**
         # filters:
         # - RewritePath=/renren-fast(?<segment>/?.*), $\{segment}
+
+
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: '*'
+  endpoint:
+    health:
+      show-details: ALWAYS
+logging:
+  file: C:\Users\Simple\Documents\CATALINA.BASE\619\${spring.application.name}.txt

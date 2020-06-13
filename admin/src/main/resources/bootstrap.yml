@@ -1,10 +1,10 @@
 spring:
   application:
-    name: search
-  cloud:
-    nacos:
+    name: admin
+#  cloud:
+#    nacos:
       # 默认值
-      server-addr: 127.0.0.1:8848
+#      server-addr: 127.0.0.1:8848
 #      discovery:
 #        # 默认值
 #        server-addr: 127.0.0.1:8848
@@ -12,4 +12,4 @@ spring:
 #        # 默认值
 #        server-addr: 127.0.0.1:8848
 server:
-  port: 20000
+  port: 8008
