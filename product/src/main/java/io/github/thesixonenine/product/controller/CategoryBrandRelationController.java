@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 // import org.apache.shiro.authz.annotation.RequiresPermissions;
 
@@ -34,6 +35,15 @@ public class CategoryBrandRelationController {
     private BrandService brandService;
     @Autowired
     private CategoryService categoryService;
+
+    @GetMapping(value = "/brands/list")
+    public R relationBrandsList(@RequestParam(value = "catId") Long catId) {
+        List<CategoryBrandRelationEntity> data = categoryBrandRelationService.list(Wrappers.<CategoryBrandRelationEntity>lambdaQuery()
+                .select(CategoryBrandRelationEntity::getBrandId, CategoryBrandRelationEntity::getBrandName)
+                .eq(CategoryBrandRelationEntity::getCatelogId, catId)
+        ).stream().collect(Collectors.toList());
+        return R.ok().put("data", data);
+    }
 
     /**
      * 获取brandId关联的分类

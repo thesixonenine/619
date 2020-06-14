@@ -125,7 +125,7 @@ public class AttrServiceImpl extends ServiceImpl<AttrDao, AttrEntity> implements
         return attrAttrgroupRelationService.list(Wrappers.<AttrAttrgroupRelationEntity>lambdaQuery()
                 .select(AttrAttrgroupRelationEntity::getAttrId, AttrAttrgroupRelationEntity::getAttrGroupId)
                 .in(AttrAttrgroupRelationEntity::getAttrId, attrIdList)
-        ).stream().filter(t->Objects.nonNull(t.getAttrId())).filter(t->Objects.nonNull(t.getAttrGroupId())
+        ).stream().filter(t -> Objects.nonNull(t.getAttrId())).filter(t -> Objects.nonNull(t.getAttrGroupId())
         ).collect(Collectors.toMap(AttrAttrgroupRelationEntity::getAttrId, AttrAttrgroupRelationEntity::getAttrGroupId));
     }
 
@@ -200,6 +200,27 @@ public class AttrServiceImpl extends ServiceImpl<AttrDao, AttrEntity> implements
     }
 
     @Override
+    public Map<Long, List<AttrEntity>> getRelationAttrBatch(List<Long> attrGroupIds) {
+        List<AttrAttrgroupRelationEntity> list = attrAttrgroupRelationService.list(Wrappers.<AttrAttrgroupRelationEntity>lambdaQuery()
+                .select(AttrAttrgroupRelationEntity::getAttrId, AttrAttrgroupRelationEntity::getAttrGroupId)
+                .in(AttrAttrgroupRelationEntity::getAttrGroupId, attrGroupIds)
+        );
+        List<Long> attrIdList = list.stream().map(AttrAttrgroupRelationEntity::getAttrId).filter(Objects::nonNull).distinct().collect(Collectors.toList());
+        List<AttrEntity> attrList = this.listByIds(attrIdList);
+
+        Map<Long, List<AttrAttrgroupRelationEntity>> map = list.stream().collect(Collectors.groupingBy(AttrAttrgroupRelationEntity::getAttrGroupId));
+        Map<Long, List<AttrEntity>> result = new HashMap<>(map.size());
+        map.forEach((k, v) -> {
+            List<Long> collect = v.stream().map(AttrAttrgroupRelationEntity::getAttrId).filter(Objects::nonNull).distinct().collect(Collectors.toList());
+            List<AttrEntity> attrEntityList = attrList.stream().filter(t -> collect.contains(t.getAttrId())).collect(Collectors.toList());
+            if (CollectionUtils.isNotEmpty(attrEntityList)) {
+                result.put(k, attrEntityList);
+            }
+        });
+        return result;
+    }
+
+    @Override
     public PageUtils listNoAttrRelation(Map<String, Object> params, Long attrGroupId) {
         // 只能关联本分组所属分类中的属性
         // 只能关联别的分组没有引用的属性
@@ -221,7 +242,7 @@ public class AttrServiceImpl extends ServiceImpl<AttrDao, AttrEntity> implements
                 .notIn(CollectionUtils.isNotEmpty(otherAttrIds), AttrEntity::getAttrId, otherAttrIds);
         String key = (String) params.get("key");
         if (StringUtils.isNotBlank(key)) {
-            queryWrapper.and((obj)->{
+            queryWrapper.and((obj) -> {
                 obj.eq(AttrEntity::getAttrId, key).or().like(AttrEntity::getAttrName, key);
             });
         }

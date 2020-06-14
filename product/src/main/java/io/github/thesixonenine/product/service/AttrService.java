@@ -64,6 +64,14 @@ public interface AttrService extends IService<AttrEntity> {
     List<AttrEntity> getRelationAttr(Long attrGroupId);
 
     /**
+     * 获取分组id下的所有attr
+     *
+     * @param attrGroupIds 分组id列表
+     * @return 该分组下的所有attr
+     */
+    Map<Long, List<AttrEntity>> getRelationAttrBatch(List<Long> attrGroupIds);
+
+    /**
      * 获取分组下没有关联的属性
      *
      * @param params      分页参数
