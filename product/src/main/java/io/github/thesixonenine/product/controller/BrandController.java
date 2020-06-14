@@ -4,6 +4,10 @@ import java.util.Arrays;
 import java.util.Map;
 
 // import org.apache.shiro.authz.annotation.RequiresPermissions;
+import com.baomidou.mybatisplus.core.toolkit.Wrappers;
+import io.github.thesixonenine.product.entity.CategoryBrandRelationEntity;
+import io.github.thesixonenine.product.service.CategoryBrandRelationService;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -67,7 +71,8 @@ public class BrandController {
     @RequestMapping("/update")
     // @RequiresPermissions("product:brand:update")
     public R update(@RequestBody BrandEntity brand){
-		brandService.updateById(brand);
+		// brandService.updateById(brand);
+        brandService.updateWithCategory(brand);
         return R.ok();
     }
 

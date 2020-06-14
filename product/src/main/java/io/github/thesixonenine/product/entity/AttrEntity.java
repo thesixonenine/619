@@ -5,7 +5,8 @@ import com.baomidou.mybatisplus.annotation.TableName;
 
 import java.io.Serializable;
 import java.util.Date;
-import lombok.Data;
+
+import lombok.*;
 
 /**
  * 商品属性
@@ -14,6 +15,9 @@ import lombok.Data;
  * @date 2020-06-06 00:59:35
  */
 @Data
+@Builder
+@AllArgsConstructor
+@NoArgsConstructor
 @TableName("pms_attr")
 public class AttrEntity implements Serializable {
 	private static final long serialVersionUID = 1L;
@@ -56,4 +60,12 @@ public class AttrEntity implements Serializable {
 	 */
 	private Integer showDesc;
 
+	@Getter
+	@AllArgsConstructor
+	public enum AttrType{
+		SALE(0,"销售属性"),
+		BASE(1,"基本属性");
+		private int key;
+		private String value;
+	}
 }

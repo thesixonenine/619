@@ -1,6 +1,8 @@
 package io.github.thesixonenine.product.service.impl;
 
 import org.springframework.stereotype.Service;
+
+import java.util.List;
 import java.util.Map;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
@@ -24,6 +26,11 @@ public class AttrAttrgroupRelationServiceImpl extends ServiceImpl<AttrAttrgroupR
         );
 
         return new PageUtils(page);
+    }
+
+    @Override
+    public void deleteAttrRelation(List<AttrAttrgroupRelationEntity> relation) {
+        baseMapper.deleteAttrRelation(relation);
     }
 
 }

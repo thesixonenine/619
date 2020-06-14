@@ -5,13 +5,13 @@ import java.util.List;
 import java.util.Map;
 
 // import org.apache.shiro.authz.annotation.RequiresPermissions;
+import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import io.github.thesixonenine.product.dto.CategoryDTO;
+import io.github.thesixonenine.product.entity.CategoryBrandRelationEntity;
+import io.github.thesixonenine.product.service.CategoryBrandRelationService;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import io.github.thesixonenine.product.entity.CategoryEntity;
 import io.github.thesixonenine.product.service.CategoryService;
@@ -36,7 +36,7 @@ public class CategoryController {
      * 学习部分
      */
 
-    @RequestMapping("/listTree")
+    @GetMapping(value = "/list/tree")
     public R listTree() {
         List<CategoryDTO> list = categoryService.listTree();
         return R.ok().put("data", list);
@@ -79,7 +79,9 @@ public class CategoryController {
     @RequestMapping("/update")
     // @RequiresPermissions("product:category:update")
     public R update(@RequestBody CategoryEntity category){
-		categoryService.updateById(category);
+		// categoryService.updateById(category);
+        // 同时更新冗余信息
+        categoryService.updateWithBrand(category);
         return R.ok();
     }
 

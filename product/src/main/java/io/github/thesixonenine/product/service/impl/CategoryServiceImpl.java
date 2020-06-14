@@ -2,26 +2,30 @@ package io.github.thesixonenine.product.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import io.github.thesixonenine.common.utils.PageUtils;
 import io.github.thesixonenine.common.utils.Query;
 import io.github.thesixonenine.product.dao.CategoryDao;
 import io.github.thesixonenine.product.dto.CategoryDTO;
+import io.github.thesixonenine.product.entity.CategoryBrandRelationEntity;
 import io.github.thesixonenine.product.entity.CategoryEntity;
+import io.github.thesixonenine.product.service.CategoryBrandRelationService;
 import io.github.thesixonenine.product.service.CategoryService;
 import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.BeanUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 
 @Service("categoryService")
 public class CategoryServiceImpl extends ServiceImpl<CategoryDao, CategoryEntity> implements CategoryService {
+    @Autowired
+    private CategoryBrandRelationService categoryBrandRelationService;
 
     @Override
     public PageUtils queryPage(Map<String, Object> params) {
@@ -48,8 +52,30 @@ public class CategoryServiceImpl extends ServiceImpl<CategoryDao, CategoryEntity
         List<CategoryDTO> rootDTO = allDTO.stream().filter(t -> t.getParentCid() == 0).collect(Collectors.toList());
         // 根节点数据排序, 循环设置子节点并返回
         return rootDTO.stream().sorted(Comparator.comparingInt(CategoryEntity::getSort))
-                .peek(dto-> setChildren(dto, allDTO))
+                .peek(dto -> setChildren(dto, allDTO))
                 .collect(Collectors.toList());
+    }
+
+    @Override
+    public List<Long> findParentCid(Long catelogId, List<Long> allCidList) {
+        allCidList.add(catelogId);
+        CategoryEntity categoryEntity = this.getOne(Wrappers.<CategoryEntity>lambdaQuery().select(CategoryEntity::getParentCid).eq(CategoryEntity::getCatId, catelogId));
+        if (Objects.nonNull(categoryEntity) && Objects.nonNull(categoryEntity.getParentCid()) &&
+                categoryEntity.getParentCid() > 0) {
+            findParentCid(categoryEntity.getParentCid(), allCidList);
+        }
+        Collections.reverse(allCidList);
+        return allCidList;
+    }
+
+    @Override
+    public void updateWithBrand(CategoryEntity category) {
+        updateById(category);
+        // 更新冗余字段
+        if (StringUtils.isNotBlank(category.getName())) {
+            categoryBrandRelationService.update(CategoryBrandRelationEntity.builder().catelogName(category.getName()).build(),
+                    Wrappers.<CategoryBrandRelationEntity>lambdaUpdate().eq(CategoryBrandRelationEntity::getBrandId, category.getCatId()));
+        }
     }
 
     /**
@@ -63,7 +89,7 @@ public class CategoryServiceImpl extends ServiceImpl<CategoryDao, CategoryEntity
         List<CategoryDTO> list = allDTO.stream()
                 .filter(t -> t.getParentCid().equals(catId))
                 .sorted(Comparator.comparingInt(CategoryEntity::getSort))
-                .peek(dto-> setChildren(dto, allDTO))
+                .peek(dto -> setChildren(dto, allDTO))
                 .collect(Collectors.toList());
         if (CollectionUtils.isNotEmpty(list)) {
             categoryDTO.setChildren(list);

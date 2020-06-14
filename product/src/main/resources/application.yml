@@ -24,3 +24,18 @@ management:
       show-details: ALWAYS
 logging:
   file: C:\Users\Simple\Documents\CATALINA.BASE\619\${spring.application.name}.txt
+  level:
+    io:
+      github:
+        thesixonenine:
+          product:
+            controller: debug
+            service:
+              impl: debug
+            dao: debug
+    com:
+      alibaba:
+        nacos:
+          client:
+            config:
+              impl: warn
