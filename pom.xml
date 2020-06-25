@@ -13,13 +13,19 @@
         <module>admin</module>
         <module>common</module>
         <module>coupon</module>
+        <module>coupon-common</module>
         <module>gateway</module>
         <module>member</module>
+        <module>member-common</module>
         <module>order</module>
+        <module>order-common</module>
         <module>product</module>
+        <module>product-common</module>
         <module>renren-fast</module>
         <module>search</module>
+        <module>search-common</module>
         <module>ware</module>
+        <module>ware-common</module>
     </modules>
 
 </project>

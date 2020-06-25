@@ -23,14 +23,8 @@
     <dependencies>
         <dependency>
             <groupId>io.github.thesixonenine</groupId>
-            <artifactId>common</artifactId>
+            <artifactId>product-common</artifactId>
             <version>0.0.1-SNAPSHOT</version>
-            <exclusions>
-                <exclusion>
-                    <groupId>joda-time</groupId>
-                    <artifactId>joda-time</artifactId>
-                </exclusion>
-            </exclusions>
         </dependency>
 
         <dependency>

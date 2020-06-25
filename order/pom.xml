@@ -23,7 +23,7 @@
     <dependencies>
         <dependency>
             <groupId>io.github.thesixonenine</groupId>
-            <artifactId>common</artifactId>
+            <artifactId>order-common</artifactId>
             <version>0.0.1-SNAPSHOT</version>
         </dependency>
 
