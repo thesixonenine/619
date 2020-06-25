@@ -1,5 +1,7 @@
 package io.github.thesixonenine.product.service.impl;
 
+import io.github.thesixonenine.product.dto.SpuInfoDTO;
+import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 import java.util.Map;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
@@ -24,6 +26,13 @@ public class SpuInfoServiceImpl extends ServiceImpl<SpuInfoDao, SpuInfoEntity> i
         );
 
         return new PageUtils(page);
+    }
+
+    @Override
+    public void saveSpuInfo(SpuInfoDTO spuInfoDTO) {
+        SpuInfoEntity spuInfoEntity = new SpuInfoEntity();
+        BeanUtils.copyProperties(spuInfoDTO, spuInfoEntity);
+        save(spuInfoEntity);
     }
 
 }
