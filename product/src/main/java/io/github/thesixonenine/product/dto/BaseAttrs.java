@@ -9,14 +9,14 @@ import lombok.Data;
  * @since 1.0
  */
 @Data
-public class BaseAttrsBean {
+public class BaseAttrs {
     /**
      * attrId : 7
      * attrValues : aaa;bb
      * showDesc : 1
      */
 
-    private Integer attrId;
+    private Long attrId;
     private String attrValues;
     private Integer showDesc;
 }

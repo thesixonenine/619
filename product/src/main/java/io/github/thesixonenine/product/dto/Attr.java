@@ -9,7 +9,7 @@ import lombok.Data;
  * @since 1.0
  */
 @Data
-public class AttrBean {
+public class Attr {
     /**
      * attrId : 9
      * attrName : 颜色

@@ -9,7 +9,7 @@ import lombok.Data;
  * @since 1.0
  */
 @Data
-public class BoundsBean {
+public class Bounds {
     /**
      * buyBounds : 500
      * growBounds : 6000

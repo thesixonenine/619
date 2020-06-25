@@ -1,11 +1,13 @@
 package io.github.thesixonenine.product.entity;
 
+import com.baomidou.mybatisplus.annotation.FieldFill;
+import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 
 import java.math.BigDecimal;
 import java.io.Serializable;
-import java.util.Date;
+import java.time.LocalDateTime;
 import lombok.Data;
 
 /**
@@ -48,13 +50,11 @@ public class SpuInfoEntity implements Serializable {
 	 * 上架状态[0 - 下架，1 - 上架]
 	 */
 	private Integer publishStatus;
-	/**
-	 * 
-	 */
-	private Date createTime;
-	/**
-	 * 
-	 */
-	private Date updateTime;
+
+	@TableField(fill = FieldFill.INSERT)
+	private LocalDateTime createTime;
+
+	@TableField(fill = FieldFill.INSERT_UPDATE)
+	private LocalDateTime updateTime;
 
 }

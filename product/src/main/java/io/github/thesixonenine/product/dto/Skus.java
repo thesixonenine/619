@@ -12,7 +12,7 @@ import java.util.List;
  * @since 1.0
  */
 @Data
-public class SkusBean {
+public class Skus {
     /**
      * attr : [{"attrId":9,"attrName":"颜色","attrValue":"黑色"},{"attrId":10,"attrName":"内存","attrValue":"6GB"}]
      * skuName : Apple XR 黑色 6GB
@@ -31,7 +31,7 @@ public class SkusBean {
      */
 
     private String skuName;
-    private String price;
+    private BigDecimal price;
     private String skuTitle;
     private String skuSubtitle;
     private Integer fullCount;
@@ -40,7 +40,7 @@ public class SkusBean {
     private Integer fullPrice;
     private Integer reducePrice;
     private Integer priceStatus;
-    private List<AttrBean> attr;
+    private List<Attr> attr;
     private List<ImagesBean> images;
     private List<String> descar;
     private List<MemberPriceBean> memberPrice;

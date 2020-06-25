@@ -34,9 +34,9 @@ public class SpuInfoDTO {
     private Integer brandId;
     private BigDecimal weight;
     private Integer publishStatus;
-    private BoundsBean bounds;
+    private Bounds bounds;
     private List<String> decript;
     private List<String> images;
-    private List<BaseAttrsBean> baseAttrs;
-    private List<SkusBean> skus;
+    private List<BaseAttrs> baseAttrs;
+    private List<Skus> skus;
 }
