@@ -68,4 +68,12 @@ public class AttrEntity implements Serializable {
 		private int key;
 		private String value;
 	}
+	@Getter
+	@AllArgsConstructor
+	public enum SearchType{
+		DISABLE(0,"不需要"),
+		ENABLE(1,"需要");
+		private int key;
+		private String value;
+	}
 }

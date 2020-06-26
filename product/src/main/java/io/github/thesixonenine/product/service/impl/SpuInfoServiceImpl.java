@@ -2,7 +2,9 @@ package io.github.thesixonenine.product.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import io.github.thesixonenine.common.es.SkuModel;
 import io.github.thesixonenine.common.utils.PageUtils;
 import io.github.thesixonenine.common.utils.Query;
 import io.github.thesixonenine.coupon.controller.MemberPriceController;
@@ -24,10 +26,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
 import java.util.stream.Collectors;
 
 
@@ -48,6 +47,10 @@ public class SpuInfoServiceImpl extends ServiceImpl<SpuInfoDao, SpuInfoEntity> i
     private SkuImagesService skuImagesService;
     @Autowired
     private SkuSaleAttrValueService skuSaleAttrValueService;
+    @Autowired
+    private BrandService brandService;
+    @Autowired
+    private CategoryService categoryService;
     @Autowired
     private SpuBoundsController spuBoundsController;
     @Autowired
@@ -195,7 +198,7 @@ public class SpuInfoServiceImpl extends ServiceImpl<SpuInfoDao, SpuInfoEntity> i
 
                 List<MemberPrice> memberPriceList = sku.getMemberPrice();
                 if (CollectionUtils.isNotEmpty(memberPriceList)) {
-                    List<MemberPriceEntity> memberPriceEntityList = memberPriceList.stream().filter(Objects::nonNull).filter(t-> t.getPrice().compareTo(BigDecimal.ZERO) > 0).map(t -> {
+                    List<MemberPriceEntity> memberPriceEntityList = memberPriceList.stream().filter(Objects::nonNull).filter(t -> t.getPrice().compareTo(BigDecimal.ZERO) > 0).map(t -> {
                         MemberPriceEntity memberPriceEntity = new MemberPriceEntity();
                         memberPriceEntity.setSkuId(skuId);
                         memberPriceEntity.setMemberLevelId(t.getId());
@@ -209,6 +212,68 @@ public class SpuInfoServiceImpl extends ServiceImpl<SpuInfoDao, SpuInfoEntity> i
             });
 
         }
+    }
+
+    @Override
+    public void up(Long spuId) {
+        List<SkuInfoEntity> skuInfoEntityList = skuInfoService.list(Wrappers.<SkuInfoEntity>lambdaQuery().eq(SkuInfoEntity::getSpuId, spuId));
+        if (CollectionUtils.isEmpty(skuInfoEntityList)) {
+            return;
+        }
+
+        // 查询品牌的信息 brandService
+        List<Long> brandIdList = skuInfoEntityList.stream().filter(Objects::nonNull).map(SkuInfoEntity::getBrandId).filter(Objects::nonNull).filter(t -> t > 0L).collect(Collectors.toList());
+        Map<Long, BrandEntity> brandMap = new HashMap<>();
+        if (CollectionUtils.isNotEmpty(brandIdList)) {
+            brandService.list(Wrappers.<BrandEntity>lambdaQuery()
+                    .select(BrandEntity::getBrandId, BrandEntity::getName)
+                    .in(BrandEntity::getBrandId, brandIdList)
+            ).stream().collect(Collectors.toMap(BrandEntity::getBrandId, v -> v)).forEach(brandMap::put);
+        }
+
+        // 查询分类的信息 categoryService
+        List<Long> catalogIdList = skuInfoEntityList.stream().filter(Objects::nonNull).map(SkuInfoEntity::getCatalogId).filter(Objects::nonNull).filter(t -> t > 0L).collect(Collectors.toList());
+        Map<Long, String> catalogMap = new HashMap<>();
+        if (CollectionUtils.isNotEmpty(catalogIdList)) {
+            categoryService.list(Wrappers.<CategoryEntity>lambdaQuery()
+                    .select(CategoryEntity::getCatId, CategoryEntity::getName)
+                    .in(CategoryEntity::getCatId, catalogIdList)
+            ).stream().collect(Collectors.toMap(CategoryEntity::getCatId, CategoryEntity::getName)).forEach(catalogMap::put);
+        }
+
+        // 查询当前sku的所有可被检索的规格属性
+        List<SkuModel.Attr> attrList = new ArrayList<>();
+        List<ProductAttrValueEntity> productAttrValueEntityList = productAttrValueService.list(Wrappers.<ProductAttrValueEntity>lambdaQuery().eq(ProductAttrValueEntity::getSpuId, spuId));
+        if (CollectionUtils.isNotEmpty(productAttrValueEntityList)) {
+            List<Long> attrIdList = productAttrValueEntityList.stream().map(ProductAttrValueEntity::getAttrId).collect(Collectors.toList());
+            if (CollectionUtils.isNotEmpty(attrIdList)) {
+                attrService.list(Wrappers.<AttrEntity>lambdaQuery()
+                        .in(AttrEntity::getAttrId, attrIdList)
+                        .eq(AttrEntity::getSearchType, AttrEntity.SearchType.ENABLE.getKey())
+                ).forEach(t -> {
+                    SkuModel.Attr attr = new SkuModel.Attr();
+                    BeanUtils.copyProperties(t, attr);
+                    attrList.add(attr);
+                });
+            }
+        }
+
+        List<SkuModel> skuModelList = skuInfoEntityList.stream().map(skuInfoEntity -> {
+            SkuModel skuModel = new SkuModel();
+            BeanUtils.copyProperties(skuInfoEntity, skuModel);
+            // TODO 查询是否有库存
+
+            skuModel.setHotScore(0L);
+            // 查询品牌, 分类
+            BrandEntity brandEntity = brandMap.get(skuInfoEntity.getBrandId());
+            skuModel.setBrandName(Objects.nonNull(brandEntity) ? brandEntity.getName() : null);
+            skuModel.setBrandImg(Objects.nonNull(brandEntity) ? brandEntity.getLogo() : null);
+            skuModel.setCategoryName(catalogMap.get(skuInfoEntity.getCatalogId()));
+            // 查询当前sku的所有可被检索的规格属性
+            skuModel.setAttrs(attrList);
+            return skuModel;
+        }).collect(Collectors.toList());
+        // TODO 发送给检索服务, 写到es中
     }
 
 }
