@@ -1,8 +1,9 @@
 package io.github.thesixonenine.search.config;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.google.gson.*;
-import com.google.gson.stream.JsonReader;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.google.gson.JsonParser;
 import lombok.Data;
 import org.elasticsearch.action.index.IndexRequest;
 import org.elasticsearch.action.index.IndexResponse;
@@ -15,8 +16,10 @@ import org.elasticsearch.index.query.MatchQueryBuilder;
 import org.elasticsearch.index.query.QueryBuilders;
 import org.elasticsearch.search.SearchHit;
 import org.elasticsearch.search.SearchHits;
-import org.elasticsearch.search.aggregations.AggregationBuilder;
+import org.elasticsearch.search.aggregations.Aggregation;
 import org.elasticsearch.search.aggregations.AggregationBuilders;
+import org.elasticsearch.search.aggregations.Aggregations;
+import org.elasticsearch.search.aggregations.bucket.terms.Terms;
 import org.elasticsearch.search.aggregations.bucket.terms.TermsAggregationBuilder;
 import org.elasticsearch.search.builder.SearchSourceBuilder;
 import org.junit.Test;
@@ -36,6 +39,7 @@ public class ElasticConfigTest {
     private RestHighLevelClient client;
     private static final ObjectMapper objectMapper = new ObjectMapper();
     private static final Gson gson = new GsonBuilder().setPrettyPrinting().create();
+
     @Test
     public void testSearchData() throws IOException {
         // 1. 创建请求
@@ -54,15 +58,26 @@ public class ElasticConfigTest {
         searchRequest.source(builder);
         // 3. 执行检索
         SearchResponse response = client.search(searchRequest, RequestOptions.DEFAULT);
-        System.out.println("执行结果:" +gson.toJson(JsonParser.parseString(response.toString())));
+        System.out.println("执行结果:" + gson.toJson(JsonParser.parseString(response.toString())));
         // 4. 分析结果
         SearchHits hits = response.getHits();
         SearchHit[] hitsHits = hits.getHits();
         for (SearchHit searchHit : hitsHits) {
-
             String index = searchHit.getIndex();
             String id = searchHit.getId();
             String type = searchHit.getType();
+        }
+
+        Aggregations aggregations = response.getAggregations();
+        for (Aggregation aggregation : aggregations.asList()) {
+            String name = aggregation.getName();
+            System.out.println("当前聚合的名称: " + name);
+            Aggregation aggr = aggregations.get(name);
+            // System.out.println("当前聚合的数据: " + aggr);
+            Terms t = (Terms) aggr;
+            for (Terms.Bucket bucket : t.getBuckets()) {
+                System.out.println("Key: " + bucket.getKeyAsString() + "; DocCount: " + bucket.getDocCount());
+            }
         }
     }
 
