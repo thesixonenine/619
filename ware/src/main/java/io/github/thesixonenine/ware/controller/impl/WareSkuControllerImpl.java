@@ -5,11 +5,15 @@ import io.github.thesixonenine.common.utils.R;
 import io.github.thesixonenine.ware.controller.WareSkuController;
 import io.github.thesixonenine.ware.entity.WareSkuEntity;
 import io.github.thesixonenine.ware.service.WareSkuService;
+import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.Arrays;
+import java.util.List;
 import java.util.Map;
+import java.util.Objects;
+import java.util.stream.Collectors;
 
 
 /**
@@ -37,6 +41,16 @@ public class WareSkuControllerImpl implements WareSkuController {
     public R info(Long id) {
         WareSkuEntity wareSku = wareSkuService.getById(id);
         return R.ok().put("wareSku", wareSku);
+    }
+
+    @Override
+    public R<List<WareSkuEntity>> listByIds(List<Long> idList) {
+        idList = idList.stream().filter(Objects::nonNull).filter(t -> t > 0).distinct().collect(Collectors.toList());
+        if (CollectionUtils.isNotEmpty(idList)) {
+            return R.okWithData(wareSkuService.listByIds(idList));
+        } else {
+            return R.okWithData(null);
+        }
     }
 
     /**

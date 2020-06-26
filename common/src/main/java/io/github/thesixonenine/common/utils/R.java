@@ -18,9 +18,19 @@ import java.util.Map;
  *
  * @author Mark sunlightcs@gmail.com
  */
-public class R extends HashMap<String, Object> {
+public class R<T> extends HashMap<String, Object> {
 	private static final long serialVersionUID = 1L;
-	
+
+	private T data;
+
+	public T getData() {
+		return data;
+	}
+
+	public void setData(T data) {
+		this.data = data;
+	}
+
 	public R() {
 		put("code", 0);
 		put("msg", "success");
@@ -46,7 +56,13 @@ public class R extends HashMap<String, Object> {
 		r.put("msg", msg);
 		return r;
 	}
-	
+
+	public static <T> R<T> okWithData(T data) {
+		R<T> r = new R<T>();
+		r.setData(data);
+		return r;
+	}
+
 	public static R ok(Map<String, Object> map) {
 		R r = new R();
 		r.putAll(map);
@@ -59,6 +75,11 @@ public class R extends HashMap<String, Object> {
 
 	public R put(String key, Object value) {
 		super.put(key, value);
+		return this;
+	}
+
+	public R<T> data(T map) {
+		setData(map);
 		return this;
 	}
 }

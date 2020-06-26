@@ -6,6 +6,7 @@ import io.swagger.annotations.Api;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
 import java.util.Map;
 
 
@@ -29,6 +30,12 @@ public interface WareSkuController {
      */
     @GetMapping("/ware/waresku/info/{id}")
     R info(@PathVariable("id") Long id);
+
+    /**
+     * 根据Id列表查询
+     */
+    @PostMapping("/ware/waresku/listByIds")
+    R<List<WareSkuEntity>> listByIds(@RequestBody List<Long> idList);
 
     /**
      * 保存

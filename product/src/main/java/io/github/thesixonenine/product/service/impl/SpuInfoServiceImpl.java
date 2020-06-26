@@ -7,6 +7,7 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import io.github.thesixonenine.common.es.SkuModel;
 import io.github.thesixonenine.common.utils.PageUtils;
 import io.github.thesixonenine.common.utils.Query;
+import io.github.thesixonenine.common.utils.R;
 import io.github.thesixonenine.coupon.controller.MemberPriceController;
 import io.github.thesixonenine.coupon.controller.SkuFullReductionController;
 import io.github.thesixonenine.coupon.controller.SkuLadderController;
@@ -19,6 +20,8 @@ import io.github.thesixonenine.product.dao.SpuInfoDao;
 import io.github.thesixonenine.product.dto.*;
 import io.github.thesixonenine.product.entity.*;
 import io.github.thesixonenine.product.service.*;
+import io.github.thesixonenine.ware.controller.WareSkuController;
+import io.github.thesixonenine.ware.entity.WareSkuEntity;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.BeanUtils;
@@ -59,6 +62,8 @@ public class SpuInfoServiceImpl extends ServiceImpl<SpuInfoDao, SpuInfoEntity> i
     private SkuLadderController skuLadderController;
     @Autowired
     private MemberPriceController memberPriceController;
+    @Autowired
+    private WareSkuController wareSkuController;
 
     @Override
     public PageUtils queryPage(Map<String, Object> params) {
@@ -258,11 +263,29 @@ public class SpuInfoServiceImpl extends ServiceImpl<SpuInfoDao, SpuInfoEntity> i
             }
         }
 
+        // 查询库存
+        List<Long> skuIdList = skuInfoEntityList.stream().filter(Objects::nonNull).map(SkuInfoEntity::getSkuId).filter(Objects::nonNull).filter(t -> t > 0).distinct().collect(Collectors.toList());
+        Map<Long, Integer> skuStock = new HashMap<>();
+        if (CollectionUtils.isNotEmpty(skuIdList)) {
+            R<List<WareSkuEntity>> r = wareSkuController.listByIds(skuIdList);
+            List<WareSkuEntity> list = r.getData();
+            if (CollectionUtils.isNotEmpty(list)) {
+                list.stream().collect(Collectors.groupingBy(WareSkuEntity::getSkuId)
+                ).forEach((key, value) -> {
+                    int stock = value.stream().mapToInt(WareSkuEntity::getStock).sum();
+                    int stockLocked = value.stream().mapToInt(WareSkuEntity::getStockLocked).sum();
+                    skuStock.put(key, stock - stockLocked);
+                });
+            }
+        }
+
         List<SkuModel> skuModelList = skuInfoEntityList.stream().map(skuInfoEntity -> {
+            Long skuId = skuInfoEntity.getSkuId();
             SkuModel skuModel = new SkuModel();
             BeanUtils.copyProperties(skuInfoEntity, skuModel);
-            // TODO 查询是否有库存
-
+            // 查询是否有库存
+            Integer stock = skuStock.get(skuId);
+            skuModel.setHasStock(Objects.nonNull(stock) && stock > 0);
             skuModel.setHotScore(0L);
             // 查询品牌, 分类
             BrandEntity brandEntity = brandMap.get(skuInfoEntity.getBrandId());
