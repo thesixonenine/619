@@ -54,7 +54,7 @@ public class SpuInfoEntity implements Serializable {
 	@TableField(fill = FieldFill.INSERT)
 	private LocalDateTime createTime;
 
-	@TableField(fill = FieldFill.INSERT_UPDATE)
+	@TableField(fill = FieldFill.UPDATE)
 	private LocalDateTime updateTime;
 
 }
