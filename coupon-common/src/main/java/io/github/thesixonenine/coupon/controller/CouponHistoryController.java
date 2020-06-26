@@ -10,50 +10,48 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
-import io.github.thesixonenine.coupon.entity.CouponEntity;
+import io.github.thesixonenine.coupon.entity.CouponHistoryEntity;
 import io.github.thesixonenine.common.utils.R;
 
 
 
 /**
- * 优惠券信息
+ * 优惠券领取历史记录
  *
  * @author thesixonenine
  * @date 2020-06-06 01:15:48
  */
-@Api(value = "优惠券信息")
+@Api(value = "优惠券领取历史记录")
 @FeignClient(name = "coupon")
-public interface CouponController {
+public interface CouponHistoryController {
     /**
      * 列表
      */
     @ApiOperation(value = "列表")
-    @RequestMapping("/coupon/coupon/list")
+    @RequestMapping("/coupon/couponhistory/list")
     R list(@RequestParam Map<String, Object> params);
-
 
     /**
      * 信息
      */
-    @RequestMapping("/coupon/coupon/info/{id}")
+    @RequestMapping("/coupon/couponhistory/info/{id}")
     R info(@PathVariable("id") Long id);
 
     /**
      * 保存
      */
-    @RequestMapping("/coupon/coupon/save")
-    R save(@RequestBody CouponEntity coupon);
+    @RequestMapping("/coupon/couponhistory/save")
+    R save(@RequestBody CouponHistoryEntity couponHistory);
 
     /**
      * 修改
      */
-    @RequestMapping("/coupon/coupon/update")
-    R update(@RequestBody CouponEntity coupon);
+    @RequestMapping("/coupon/couponhistory/update")
+    R update(@RequestBody CouponHistoryEntity couponHistory);
 
     /**
      * 删除
      */
-    @RequestMapping("/coupon/coupon/delete")
+    @RequestMapping("/coupon/couponhistory/delete")
     R delete(@RequestBody Long[] ids);
-
 }

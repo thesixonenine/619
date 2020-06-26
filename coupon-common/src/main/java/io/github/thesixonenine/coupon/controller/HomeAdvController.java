@@ -1,59 +1,56 @@
 package io.github.thesixonenine.coupon.controller;
 
-import java.util.Map;
-
+import io.github.thesixonenine.common.utils.R;
+import io.github.thesixonenine.coupon.entity.HomeAdvEntity;
 import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
-import io.github.thesixonenine.coupon.entity.CouponEntity;
-import io.github.thesixonenine.common.utils.R;
-
+import java.util.Map;
 
 
 /**
- * 优惠券信息
+ * 首页轮播广告
  *
  * @author thesixonenine
  * @date 2020-06-06 01:15:48
  */
-@Api(value = "优惠券信息")
+@Api(value = "首页轮播广告")
 @FeignClient(name = "coupon")
-public interface CouponController {
+public interface HomeAdvController {
+
     /**
      * 列表
      */
-    @ApiOperation(value = "列表")
-    @RequestMapping("/coupon/coupon/list")
+    @RequestMapping("/coupon/homeadv/list")
     R list(@RequestParam Map<String, Object> params);
 
 
     /**
      * 信息
      */
-    @RequestMapping("/coupon/coupon/info/{id}")
+    @RequestMapping("/coupon/homeadv/info/{id}")
     R info(@PathVariable("id") Long id);
 
     /**
      * 保存
      */
-    @RequestMapping("/coupon/coupon/save")
-    R save(@RequestBody CouponEntity coupon);
+    @RequestMapping("/coupon/homeadv/save")
+    R save(@RequestBody HomeAdvEntity homeAdv);
 
     /**
      * 修改
      */
-    @RequestMapping("/coupon/coupon/update")
-    R update(@RequestBody CouponEntity coupon);
+    @RequestMapping("/coupon/homeadv/update")
+    R update(@RequestBody HomeAdvEntity homeAdv);
 
     /**
      * 删除
      */
-    @RequestMapping("/coupon/coupon/delete")
+    @RequestMapping("/coupon/homeadv/delete")
     R delete(@RequestBody Long[] ids);
 
 }
