@@ -9,7 +9,7 @@ import lombok.Data;
  * @since 1.0
  */
 @Data
-public class ImagesBean {
+public class Images {
     /**
      * imgUrl : https://gulimall-hello.oss-cn-beijing.aliyuncs.com/2019-11-22//dcfcaec3-06d8-459b-8759-dbefc247845e_5b5e74d0978360a1.jpg
      * defaultImg : 1

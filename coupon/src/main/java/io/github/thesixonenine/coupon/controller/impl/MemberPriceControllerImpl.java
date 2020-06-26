@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.Arrays;
+import java.util.List;
 import java.util.Map;
 
 
@@ -45,6 +46,15 @@ public class MemberPriceControllerImpl implements MemberPriceController {
      */
     public R save(MemberPriceEntity memberPrice) {
         memberPriceService.save(memberPrice);
+        return R.ok();
+    }
+
+    /**
+     * 批量保存
+     */
+    @Override
+    public R saveBatch(List<MemberPriceEntity> memberPriceList) {
+        memberPriceService.saveBatch(memberPriceList);
         return R.ok();
     }
 

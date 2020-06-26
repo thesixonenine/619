@@ -2,6 +2,8 @@ package io.github.thesixonenine.product.dto;
 
 import lombok.Data;
 
+import java.math.BigDecimal;
+
 /**
  * @author Simple
  * @version 1.0
@@ -15,6 +17,6 @@ public class Bounds {
      * growBounds : 6000
      */
 
-    private Integer buyBounds;
-    private Integer growBounds;
+    private BigDecimal buyBounds;
+    private BigDecimal growBounds;
 }

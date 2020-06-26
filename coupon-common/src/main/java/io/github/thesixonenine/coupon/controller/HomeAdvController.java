@@ -4,10 +4,7 @@ import io.github.thesixonenine.common.utils.R;
 import io.github.thesixonenine.coupon.entity.HomeAdvEntity;
 import io.swagger.annotations.Api;
 import org.springframework.cloud.openfeign.FeignClient;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.Map;
 
@@ -25,32 +22,32 @@ public interface HomeAdvController {
     /**
      * 列表
      */
-    @RequestMapping("/coupon/homeadv/list")
+    @GetMapping("/coupon/homeadv/list")
     R list(@RequestParam Map<String, Object> params);
 
 
     /**
      * 信息
      */
-    @RequestMapping("/coupon/homeadv/info/{id}")
+    @GetMapping("/coupon/homeadv/info/{id}")
     R info(@PathVariable("id") Long id);
 
     /**
      * 保存
      */
-    @RequestMapping("/coupon/homeadv/save")
+    @PostMapping("/coupon/homeadv/save")
     R save(@RequestBody HomeAdvEntity homeAdv);
 
     /**
      * 修改
      */
-    @RequestMapping("/coupon/homeadv/update")
+    @PostMapping("/coupon/homeadv/update")
     R update(@RequestBody HomeAdvEntity homeAdv);
 
     /**
      * 删除
      */
-    @RequestMapping("/coupon/homeadv/delete")
+    @PostMapping("/coupon/homeadv/delete")
     R delete(@RequestBody Long[] ids);
 
 }

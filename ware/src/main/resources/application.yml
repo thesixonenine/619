@@ -1,4 +1,6 @@
 spring:
+  main:
+    allow-bean-definition-overriding: true
   datasource:
     url: jdbc:mysql://192.168.137.10:3306/wms?useUnicode=true&characterEncoding=UTF-8&useSSL=false&serverTimezone=Asia/Shanghai
     username: root
@@ -47,3 +49,10 @@ management:
       show-details: ALWAYS
 logging:
   file: C:\Users\Simple\Documents\CATALINA.BASE\619\${spring.application.name}.txt
+  level:
+    com:
+      alibaba:
+        nacos:
+          client:
+            config:
+              impl: warn

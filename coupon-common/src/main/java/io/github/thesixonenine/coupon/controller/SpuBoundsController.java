@@ -4,10 +4,7 @@ import io.github.thesixonenine.common.utils.R;
 import io.github.thesixonenine.coupon.entity.SpuBoundsEntity;
 import io.swagger.annotations.Api;
 import org.springframework.cloud.openfeign.FeignClient;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.Map;
 
@@ -24,32 +21,31 @@ public interface SpuBoundsController {
     /**
      * 列表
      */
-    @RequestMapping("/coupon/spubounds/list")
+    @GetMapping("/coupon/spubounds/list")
     R list(@RequestParam Map<String, Object> params);
-
 
     /**
      * 信息
      */
-    @RequestMapping("/coupon/spubounds/info/{id}")
+    @GetMapping("/coupon/spubounds/info/{id}")
     R info(@PathVariable("id") Long id);
 
     /**
      * 保存
      */
-    @RequestMapping("/coupon/spubounds/save")
+    @PostMapping("/coupon/spubounds/save")
     R save(@RequestBody SpuBoundsEntity spuBounds);
 
     /**
      * 修改
      */
-    @RequestMapping("/coupon/spubounds/update")
+    @PostMapping("/coupon/spubounds/update")
     R update(@RequestBody SpuBoundsEntity spuBounds);
 
     /**
      * 删除
      */
-    @RequestMapping("/coupon/spubounds/delete")
+    @PostMapping("/coupon/spubounds/delete")
     R delete(@RequestBody Long[] ids);
 
 }

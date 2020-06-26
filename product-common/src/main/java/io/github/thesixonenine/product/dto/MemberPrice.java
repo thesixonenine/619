@@ -11,14 +11,14 @@ import java.math.BigDecimal;
  * @since 1.0
  */
 @Data
-public class MemberPriceBean {
+public class MemberPrice {
     /**
      * id : 1
      * name : aaa
      * price : 1998.99
      */
 
-    private Integer id;
+    private Long id;
     private String name;
     private BigDecimal price;
 }

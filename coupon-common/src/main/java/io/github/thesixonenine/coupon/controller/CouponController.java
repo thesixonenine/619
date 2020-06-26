@@ -5,10 +5,7 @@ import java.util.Map;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.cloud.openfeign.FeignClient;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.*;
 
 import io.github.thesixonenine.coupon.entity.CouponEntity;
 import io.github.thesixonenine.common.utils.R;
@@ -28,32 +25,31 @@ public interface CouponController {
      * 列表
      */
     @ApiOperation(value = "列表")
-    @RequestMapping("/coupon/coupon/list")
+    @GetMapping("/coupon/coupon/list")
     R list(@RequestParam Map<String, Object> params);
-
 
     /**
      * 信息
      */
-    @RequestMapping("/coupon/coupon/info/{id}")
+    @GetMapping("/coupon/coupon/info/{id}")
     R info(@PathVariable("id") Long id);
 
     /**
      * 保存
      */
-    @RequestMapping("/coupon/coupon/save")
+    @PostMapping("/coupon/coupon/save")
     R save(@RequestBody CouponEntity coupon);
 
     /**
      * 修改
      */
-    @RequestMapping("/coupon/coupon/update")
+    @PostMapping("/coupon/coupon/update")
     R update(@RequestBody CouponEntity coupon);
 
     /**
      * 删除
      */
-    @RequestMapping("/coupon/coupon/delete")
+    @PostMapping("/coupon/coupon/delete")
     R delete(@RequestBody Long[] ids);
 
 }

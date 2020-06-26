@@ -5,6 +5,14 @@ import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import io.github.thesixonenine.common.utils.PageUtils;
 import io.github.thesixonenine.common.utils.Query;
+import io.github.thesixonenine.coupon.controller.MemberPriceController;
+import io.github.thesixonenine.coupon.controller.SkuFullReductionController;
+import io.github.thesixonenine.coupon.controller.SkuLadderController;
+import io.github.thesixonenine.coupon.controller.SpuBoundsController;
+import io.github.thesixonenine.coupon.entity.MemberPriceEntity;
+import io.github.thesixonenine.coupon.entity.SkuFullReductionEntity;
+import io.github.thesixonenine.coupon.entity.SkuLadderEntity;
+import io.github.thesixonenine.coupon.entity.SpuBoundsEntity;
 import io.github.thesixonenine.product.dao.SpuInfoDao;
 import io.github.thesixonenine.product.dto.*;
 import io.github.thesixonenine.product.entity.*;
@@ -15,6 +23,7 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -39,6 +48,14 @@ public class SpuInfoServiceImpl extends ServiceImpl<SpuInfoDao, SpuInfoEntity> i
     private SkuImagesService skuImagesService;
     @Autowired
     private SkuSaleAttrValueService skuSaleAttrValueService;
+    @Autowired
+    private SpuBoundsController spuBoundsController;
+    @Autowired
+    private SkuFullReductionController skuFullReductionController;
+    @Autowired
+    private SkuLadderController skuLadderController;
+    @Autowired
+    private MemberPriceController memberPriceController;
 
     @Override
     public PageUtils queryPage(Map<String, Object> params) {
@@ -106,6 +123,14 @@ public class SpuInfoServiceImpl extends ServiceImpl<SpuInfoDao, SpuInfoEntity> i
             }
         }
 
+        Bounds bounds = dto.getBounds();
+        if (Objects.nonNull(bounds)) {
+            SpuBoundsEntity spuBoundsEntity = new SpuBoundsEntity();
+            BeanUtils.copyProperties(bounds, spuBoundsEntity);
+            spuBoundsEntity.setSpuId(spuId);
+            spuBoundsController.save(spuBoundsEntity);
+        }
+
         // 保存sku的信息
 
         List<Skus> skuList = dto.getSkus();
@@ -117,7 +142,7 @@ public class SpuInfoServiceImpl extends ServiceImpl<SpuInfoDao, SpuInfoEntity> i
                 skuInfoEntity.setCatalogId(catalogId);
                 skuInfoEntity.setSaleCount(0L);
                 skuInfoEntity.setSpuId(spuId);
-                List<ImagesBean> images = sku.getImages();
+                List<Images> images = sku.getImages();
                 if (CollectionUtils.isNotEmpty(images)) {
                     images.stream().filter(Objects::nonNull).filter(t -> Objects.nonNull(t.getDefaultImg())).filter(t -> t.getDefaultImg() == 1).findFirst().ifPresent(t -> {
                         skuInfoEntity.setSkuDefaultImg(t.getImgUrl());
@@ -128,7 +153,7 @@ public class SpuInfoServiceImpl extends ServiceImpl<SpuInfoDao, SpuInfoEntity> i
                 skuInfoService.save(skuInfoEntity);
                 Long skuId = skuInfoEntity.getSkuId();
 
-                List<SkuImagesEntity> skuImagesEntityList = images.stream().filter(Objects::nonNull).map(t -> {
+                List<SkuImagesEntity> skuImagesEntityList = images.stream().filter(Objects::nonNull).filter(t -> StringUtils.isNotBlank(t.getImgUrl())).map(t -> {
                     SkuImagesEntity skuImagesEntity = new SkuImagesEntity();
                     skuImagesEntity.setSkuId(skuId);
                     skuImagesEntity.setImgUrl(t.getImgUrl());
@@ -153,6 +178,34 @@ public class SpuInfoServiceImpl extends ServiceImpl<SpuInfoDao, SpuInfoEntity> i
                 }
 
                 // TODO 远程服务调用保存优惠信息
+                if (sku.getFullPrice().compareTo(BigDecimal.ZERO) > 0) {
+                    SkuFullReductionEntity skuFullReductionEntity = new SkuFullReductionEntity();
+                    BeanUtils.copyProperties(sku, skuFullReductionEntity);
+                    skuFullReductionEntity.setSkuId(skuId);
+                    skuFullReductionController.save(skuFullReductionEntity);
+                }
+
+                if (sku.getFullCount() > 0) {
+                    SkuLadderEntity skuLadderEntity = new SkuLadderEntity();
+                    BeanUtils.copyProperties(sku, skuLadderEntity);
+                    skuLadderEntity.setSkuId(skuId);
+                    skuLadderEntity.setAddOther(sku.getCountStatus());
+                    skuLadderController.save(skuLadderEntity);
+                }
+
+                List<MemberPrice> memberPriceList = sku.getMemberPrice();
+                if (CollectionUtils.isNotEmpty(memberPriceList)) {
+                    List<MemberPriceEntity> memberPriceEntityList = memberPriceList.stream().filter(Objects::nonNull).filter(t-> t.getPrice().compareTo(BigDecimal.ZERO) > 0).map(t -> {
+                        MemberPriceEntity memberPriceEntity = new MemberPriceEntity();
+                        memberPriceEntity.setSkuId(skuId);
+                        memberPriceEntity.setMemberLevelId(t.getId());
+                        memberPriceEntity.setMemberLevelName(t.getName());
+                        memberPriceEntity.setMemberPrice(t.getPrice());
+                        memberPriceEntity.setAddOther(1);
+                        return memberPriceEntity;
+                    }).collect(Collectors.toList());
+                    memberPriceController.saveBatch(memberPriceEntityList);
+                }
             });
 
         }

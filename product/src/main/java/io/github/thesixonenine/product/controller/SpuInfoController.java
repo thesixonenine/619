@@ -1,22 +1,15 @@
 package io.github.thesixonenine.product.controller;
 
-import java.util.Arrays;
-import java.util.Map;
-
-// import org.apache.shiro.authz.annotation.RequiresPermissions;
-import io.github.thesixonenine.product.dto.SpuInfoDTO;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
-
-import io.github.thesixonenine.product.entity.SpuInfoEntity;
-import io.github.thesixonenine.product.service.SpuInfoService;
 import io.github.thesixonenine.common.utils.PageUtils;
 import io.github.thesixonenine.common.utils.R;
+import io.github.thesixonenine.product.dto.SpuInfoDTO;
+import io.github.thesixonenine.product.entity.SpuInfoEntity;
+import io.github.thesixonenine.product.service.SpuInfoService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.*;
 
+import java.util.Arrays;
+import java.util.Map;
 
 
 /**
@@ -34,40 +27,35 @@ public class SpuInfoController {
     /**
      * 列表
      */
-    @RequestMapping("/list")
-    // @RequiresPermissions("product:spuinfo:list")
-    public R list(@RequestParam Map<String, Object> params){
+    @GetMapping("/list")
+    public R list(@RequestParam Map<String, Object> params) {
         PageUtils page = spuInfoService.queryPage(params);
         return R.ok().put("page", page);
     }
-
-
+    
     /**
      * 信息
      */
-    @RequestMapping("/info/{id}")
-    // @RequiresPermissions("product:spuinfo:info")
-    public R info(@PathVariable("id") Long id){
-		SpuInfoEntity spuInfo = spuInfoService.getById(id);
+    @GetMapping("/info/{id}")
+    public R info(@PathVariable("id") Long id) {
+        SpuInfoEntity spuInfo = spuInfoService.getById(id);
         return R.ok().put("spuInfo", spuInfo);
     }
 
     /**
      * 保存
      */
-    @RequestMapping("/save")
-    // @RequiresPermissions("product:spuinfo:save")
-    public R save(@RequestBody SpuInfoEntity spuInfo){
-		spuInfoService.save(spuInfo);
+    @PostMapping("/save")
+    public R save(@RequestBody SpuInfoEntity spuInfo) {
+        spuInfoService.save(spuInfo);
         return R.ok();
     }
 
     /**
      * 保存
      */
-    @RequestMapping("/saveSpuInfo")
-    // @RequiresPermissions("product:skuinfo:save")
-    public R saveSpuInfo(@RequestBody SpuInfoDTO spuInfoDTO){
+    @PostMapping("/saveSpuInfo")
+    public R saveSpuInfo(@RequestBody SpuInfoDTO spuInfoDTO) {
         spuInfoService.saveSpuInfo(spuInfoDTO);
         return R.ok();
     }
@@ -75,20 +63,18 @@ public class SpuInfoController {
     /**
      * 修改
      */
-    @RequestMapping("/update")
-    // @RequiresPermissions("product:spuinfo:update")
-    public R update(@RequestBody SpuInfoEntity spuInfo){
-		spuInfoService.updateById(spuInfo);
+    @PostMapping("/update")
+    public R update(@RequestBody SpuInfoEntity spuInfo) {
+        spuInfoService.updateById(spuInfo);
         return R.ok();
     }
 
     /**
      * 删除
      */
-    @RequestMapping("/delete")
-    // @RequiresPermissions("product:spuinfo:delete")
-    public R delete(@RequestBody Long[] ids){
-		spuInfoService.removeByIds(Arrays.asList(ids));
+    @PostMapping("/delete")
+    public R delete(@RequestBody Long[] ids) {
+        spuInfoService.removeByIds(Arrays.asList(ids));
         return R.ok();
     }
 

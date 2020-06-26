@@ -4,10 +4,7 @@ import io.github.thesixonenine.common.utils.R;
 import io.github.thesixonenine.coupon.entity.SeckillSkuNoticeEntity;
 import io.swagger.annotations.Api;
 import org.springframework.cloud.openfeign.FeignClient;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.Map;
 
@@ -25,32 +22,31 @@ public interface SeckillSkuNoticeController {
     /**
      * 列表
      */
-    @RequestMapping("/coupon/seckillskunotice/list")
+    @GetMapping("/coupon/seckillskunotice/list")
     R list(@RequestParam Map<String, Object> params);
-
 
     /**
      * 信息
      */
-    @RequestMapping("/coupon/seckillskunotice/info/{id}")
+    @GetMapping("/coupon/seckillskunotice/info/{id}")
     R info(@PathVariable("id") Long id);
 
     /**
      * 保存
      */
-    @RequestMapping("/coupon/seckillskunotice/save")
+    @PostMapping("/coupon/seckillskunotice/save")
     R save(@RequestBody SeckillSkuNoticeEntity seckillSkuNotice);
 
     /**
      * 修改
      */
-    @RequestMapping("/coupon/seckillskunotice/update")
+    @PostMapping("/coupon/seckillskunotice/update")
     R update(@RequestBody SeckillSkuNoticeEntity seckillSkuNotice);
 
     /**
      * 删除
      */
-    @RequestMapping("/coupon/seckillskunotice/delete")
+    @PostMapping("/coupon/seckillskunotice/delete")
     R delete(@RequestBody Long[] ids);
 
 }

@@ -37,11 +37,11 @@ public class Skus {
     private Integer fullCount;
     private BigDecimal discount;
     private Integer countStatus;
-    private Integer fullPrice;
-    private Integer reducePrice;
+    private BigDecimal fullPrice;
+    private BigDecimal reducePrice;
     private Integer priceStatus;
     private List<Attr> attr;
-    private List<ImagesBean> images;
+    private List<Images> images;
     private List<String> descar;
-    private List<MemberPriceBean> memberPrice;
+    private List<MemberPrice> memberPrice;
 }

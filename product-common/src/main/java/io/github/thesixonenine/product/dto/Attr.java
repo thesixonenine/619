@@ -16,7 +16,7 @@ public class Attr {
      * attrValue : 黑色
      */
 
-    private Integer attrId;
+    private Long attrId;
     private String attrName;
     private String attrValue;
 }

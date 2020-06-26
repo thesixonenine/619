@@ -4,10 +4,7 @@ import io.github.thesixonenine.common.utils.R;
 import io.github.thesixonenine.coupon.entity.SkuLadderEntity;
 import io.swagger.annotations.Api;
 import org.springframework.cloud.openfeign.FeignClient;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.Map;
 
@@ -24,31 +21,31 @@ public interface SkuLadderController {
     /**
      * 列表
      */
-    @RequestMapping("/coupon/skuladder/list")
+    @GetMapping("/coupon/skuladder/list")
     R list(@RequestParam Map<String, Object> params);
 
     /**
      * 信息
      */
-    @RequestMapping("/coupon/skuladder/info/{id}")
+    @GetMapping("/coupon/skuladder/info/{id}")
     R info(@PathVariable("id") Long id);
 
     /**
      * 保存
      */
-    @RequestMapping("/coupon/skuladder/save")
+    @PostMapping("/coupon/skuladder/save")
     R save(@RequestBody SkuLadderEntity skuLadder);
 
     /**
      * 修改
      */
-    @RequestMapping("/coupon/skuladder/update")
+    @PostMapping("/coupon/skuladder/update")
     R update(@RequestBody SkuLadderEntity skuLadder);
 
     /**
      * 删除
      */
-    @RequestMapping("/coupon/skuladder/delete")
+    @PostMapping("/coupon/skuladder/delete")
     R delete(@RequestBody Long[] ids);
 
 }

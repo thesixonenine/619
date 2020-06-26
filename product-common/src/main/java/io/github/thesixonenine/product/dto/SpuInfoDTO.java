@@ -30,8 +30,8 @@ public class SpuInfoDTO {
 
     private String spuName;
     private String spuDescription;
-    private Integer catalogId;
-    private Integer brandId;
+    private Long catalogId;
+    private Long brandId;
     private BigDecimal weight;
     private Integer publishStatus;
     private Bounds bounds;
