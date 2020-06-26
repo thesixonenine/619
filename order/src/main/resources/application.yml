@@ -13,7 +13,29 @@ mybatis-plus:
       id-type: auto
 server:
   port: 9000
+  undertow:
+    io-threads: 2
+    worker-threads: 16
 
+feign:
+  httpclient:
+    enabled: false
+  okhttp:
+    enabled: true
+
+ribbon:
+  # 请求处理的超时时间
+  ReadTimeout: 40000
+  # 请求连接的超时时间
+  ConnectTimeout: 10000
+  # 对当前实例的重试次数
+  maxAutoRetries: 1
+  # 切换实例的重试次数
+  maxAutoRetriesNextServer: 3
+  # 重试默认都是只支持get请求，如果设置位true则会多所有请求开启重试，但不建议这样设置，因为post请求大多都是写入请求，如果要支持重试，服务自身的幂等性一定要健壮
+  okToRetryOnAllOperations: false
+  #ribbon缓存刷新时间
+  ServerListRefreshInterval: 3000
 
 management:
   endpoints:
