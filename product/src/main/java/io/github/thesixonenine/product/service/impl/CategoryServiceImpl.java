@@ -15,6 +15,7 @@ import io.github.thesixonenine.product.service.CategoryService;
 import io.github.thesixonenine.product.vo.Catalog2VO;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.redisson.api.RedissonClient;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.Cacheable;
@@ -28,6 +29,8 @@ import java.util.stream.Collectors;
 public class CategoryServiceImpl extends ServiceImpl<CategoryDao, CategoryEntity> implements CategoryService {
     @Autowired
     private CategoryBrandRelationService categoryBrandRelationService;
+    @Autowired
+    private RedissonClient redissonClient;
 
     @Override
     public PageUtils queryPage(Map<String, Object> params) {
@@ -104,7 +107,7 @@ public class CategoryServiceImpl extends ServiceImpl<CategoryDao, CategoryEntity
 
     @Override
     @Cacheable(value = "catalogLevel1")
-    public List<CategoryEntity> catalogLevel1(){
+    public List<CategoryEntity> catalogLevel1() {
         return list(Wrappers.<CategoryEntity>lambdaQuery()
                 .eq(CategoryEntity::getParentCid, 0)
                 .eq(CategoryEntity::getCatLevel, 1)
@@ -114,6 +117,21 @@ public class CategoryServiceImpl extends ServiceImpl<CategoryDao, CategoryEntity
     @Override
     @Cacheable(value = "catalog")
     public Map<String, List<Catalog2VO>> catalog() {
+        return getCatalogFormDB();
+    }
+
+    private Map<String, List<Catalog2VO>> getCatalogFormRedis() {
+        // 缓存更新策略
+        // 双写
+        // 失效
+
+        // 失效模式 + 分布式读写锁
+
+        // canal 订阅MySQL的binlog来更新redis  解决数据异构 (访问记录表, 订单表, 商品表, 购物车表) => 推荐表
+        return null;
+    }
+
+    private Map<String, List<Catalog2VO>> getCatalogFormDB() {
         // 查询一级分类
         List<CategoryEntity> list = list(Wrappers.<CategoryEntity>lambdaQuery()
                 .eq(CategoryEntity::getParentCid, 0)

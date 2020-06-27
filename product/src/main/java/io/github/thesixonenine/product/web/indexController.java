@@ -4,6 +4,8 @@ import io.github.thesixonenine.product.entity.CategoryEntity;
 import io.github.thesixonenine.product.service.CategoryService;
 import io.github.thesixonenine.product.vo.Catalog2VO;
 import lombok.extern.slf4j.Slf4j;
+import org.redisson.api.RLock;
+import org.redisson.api.RedissonClient;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -38,5 +40,24 @@ public class indexController {
     @ResponseBody
     public Map<String, List<Catalog2VO>> catalog() {
         return categoryService.catalog();
+    }
+
+
+    @Autowired
+    private RedissonClient redissonClient;
+
+    @GetMapping(value = {"/test/redisson"})
+    @ResponseBody
+    public String testRedisson() {
+        String lockName = "LOCK";
+        RLock lock = redissonClient.getLock(lockName);
+        lock.lock();
+        try {
+            System.out.println("执行业务");
+        } finally {
+            lock.unlock();
+        }
+
+        return "Hi";
     }
 }
