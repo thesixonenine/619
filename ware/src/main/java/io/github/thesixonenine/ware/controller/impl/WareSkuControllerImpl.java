@@ -41,12 +41,12 @@ public class WareSkuControllerImpl implements WareSkuController {
     }
 
     @Override
-    public List<WareSkuEntity> listByIds(List<Long> idList) {
+    public R listByIds(List<Long> idList) {
         idList = idList.stream().filter(Objects::nonNull).filter(t -> t > 0).distinct().collect(Collectors.toList());
         if (CollectionUtils.isNotEmpty(idList)) {
-            return wareSkuService.listByIds(idList);
+            return R.ok().setData(wareSkuService.listByIds(idList));
         } else {
-            return new ArrayList<>(0);
+            return R.ok().setData(null);
         }
     }
 

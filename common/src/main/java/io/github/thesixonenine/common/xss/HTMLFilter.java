@@ -293,15 +293,15 @@ public final class HTMLFilter {
         }
         m.appendTail(buf);
 
-        s = buf.toString();
-
         // these get tallied in processTag
         // (remember to reset before subsequent calls to filter method)
+        StringBuilder sBuilder = new StringBuilder(buf.toString());
         for (String key : vTagCounts.keySet()) {
             for (int ii = 0; ii < vTagCounts.get(key); ii++) {
-                s += "</" + key + ">";
+                sBuilder.append("</").append(key).append(">");
             }
         }
+        s = sBuilder.toString();
 
         return s;
     }
@@ -351,7 +351,7 @@ public final class HTMLFilter {
 
             //debug( "in a starting tag, name='" + name + "'; body='" + body + "'; ending='" + ending + "'" );
             if (allowed(name)) {
-                String params = "";
+                StringBuilder params = new StringBuilder();
 
                 final Matcher m2 = P_QUOTED_ATTRIBUTES.matcher(body);
                 final Matcher m3 = P_UNQUOTED_ATTRIBUTES.matcher(body);
@@ -379,7 +379,7 @@ public final class HTMLFilter {
                         if (inArray(paramName, vProtocolAtts)) {
                             paramValue = processParamProtocol(paramValue);
                         }
-                        params += " " + paramName + "=\"" + paramValue + "\"";
+                        params.append(" ").append(paramName).append("=\"").append(paramValue).append("\"");
                     }
                 }
 
@@ -438,7 +438,7 @@ public final class HTMLFilter {
         Matcher m = P_ENTITY.matcher(s);
         while (m.find()) {
             final String match = m.group(1);
-            final int decimal = Integer.decode(match).intValue();
+            final int decimal = Integer.decode(match);
             m.appendReplacement(buf, Matcher.quoteReplacement(chr(decimal)));
         }
         m.appendTail(buf);
@@ -448,7 +448,7 @@ public final class HTMLFilter {
         m = P_ENTITY_UNICODE.matcher(s);
         while (m.find()) {
             final String match = m.group(1);
-            final int decimal = Integer.valueOf(match, 16).intValue();
+            final int decimal = Integer.valueOf(match, 16);
             m.appendReplacement(buf, Matcher.quoteReplacement(chr(decimal)));
         }
         m.appendTail(buf);
@@ -458,7 +458,7 @@ public final class HTMLFilter {
         m = P_ENCODE.matcher(s);
         while (m.find()) {
             final String match = m.group(1);
-            final int decimal = Integer.valueOf(match, 16).intValue();
+            final int decimal = Integer.valueOf(match, 16);
             m.appendReplacement(buf, Matcher.quoteReplacement(chr(decimal)));
         }
         m.appendTail(buf);

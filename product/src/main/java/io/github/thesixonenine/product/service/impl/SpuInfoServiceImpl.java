@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.google.gson.reflect.TypeToken;
 import io.github.thesixonenine.common.es.SkuModel;
 import io.github.thesixonenine.common.utils.PageUtils;
 import io.github.thesixonenine.common.utils.Query;
@@ -270,7 +271,8 @@ public class SpuInfoServiceImpl extends ServiceImpl<SpuInfoDao, SpuInfoEntity> i
         List<Long> skuIdList = skuInfoEntityList.stream().filter(Objects::nonNull).map(SkuInfoEntity::getSkuId).filter(Objects::nonNull).filter(t -> t > 0).distinct().collect(Collectors.toList());
         Map<Long, Integer> skuStock = new HashMap<>();
         if (CollectionUtils.isNotEmpty(skuIdList)) {
-            List<WareSkuEntity> list = wareSkuController.listByIds(skuIdList);
+            R r = wareSkuController.listByIds(skuIdList);
+            List<WareSkuEntity> list = r.getData(new TypeToken<List<WareSkuEntity>>() {});
             if (CollectionUtils.isNotEmpty(list)) {
                 list.stream().collect(Collectors.groupingBy(WareSkuEntity::getSkuId)
                 ).forEach((key, value) -> {

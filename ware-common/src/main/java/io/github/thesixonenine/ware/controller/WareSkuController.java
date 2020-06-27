@@ -35,7 +35,7 @@ public interface WareSkuController {
      * 根据Id列表查询
      */
     @PostMapping("/ware/waresku/listByIds")
-    List<WareSkuEntity> listByIds(@RequestBody List<Long> idList);
+    R listByIds(@RequestBody List<Long> idList);
 
     /**
      * 保存
