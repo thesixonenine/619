@@ -9,10 +9,7 @@ import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
 import java.util.stream.Collectors;
 
 
@@ -44,12 +41,12 @@ public class WareSkuControllerImpl implements WareSkuController {
     }
 
     @Override
-    public R<List<WareSkuEntity>> listByIds(List<Long> idList) {
+    public List<WareSkuEntity> listByIds(List<Long> idList) {
         idList = idList.stream().filter(Objects::nonNull).filter(t -> t > 0).distinct().collect(Collectors.toList());
         if (CollectionUtils.isNotEmpty(idList)) {
-            return R.okWithData(wareSkuService.listByIds(idList));
+            return wareSkuService.listByIds(idList);
         } else {
-            return R.okWithData(null);
+            return new ArrayList<>(0);
         }
     }
 

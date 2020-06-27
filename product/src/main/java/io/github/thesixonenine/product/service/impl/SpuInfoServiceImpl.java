@@ -20,6 +20,7 @@ import io.github.thesixonenine.product.dao.SpuInfoDao;
 import io.github.thesixonenine.product.dto.*;
 import io.github.thesixonenine.product.entity.*;
 import io.github.thesixonenine.product.service.*;
+import io.github.thesixonenine.search.controller.ElasticSearchController;
 import io.github.thesixonenine.ware.controller.WareSkuController;
 import io.github.thesixonenine.ware.entity.WareSkuEntity;
 import org.apache.commons.collections4.CollectionUtils;
@@ -64,6 +65,8 @@ public class SpuInfoServiceImpl extends ServiceImpl<SpuInfoDao, SpuInfoEntity> i
     private MemberPriceController memberPriceController;
     @Autowired
     private WareSkuController wareSkuController;
+    @Autowired
+    private ElasticSearchController elasticSearchController;
 
     @Override
     public PageUtils queryPage(Map<String, Object> params) {
@@ -267,8 +270,7 @@ public class SpuInfoServiceImpl extends ServiceImpl<SpuInfoDao, SpuInfoEntity> i
         List<Long> skuIdList = skuInfoEntityList.stream().filter(Objects::nonNull).map(SkuInfoEntity::getSkuId).filter(Objects::nonNull).filter(t -> t > 0).distinct().collect(Collectors.toList());
         Map<Long, Integer> skuStock = new HashMap<>();
         if (CollectionUtils.isNotEmpty(skuIdList)) {
-            R<List<WareSkuEntity>> r = wareSkuController.listByIds(skuIdList);
-            List<WareSkuEntity> list = r.getData();
+            List<WareSkuEntity> list = wareSkuController.listByIds(skuIdList);
             if (CollectionUtils.isNotEmpty(list)) {
                 list.stream().collect(Collectors.groupingBy(WareSkuEntity::getSkuId)
                 ).forEach((key, value) -> {
@@ -296,7 +298,17 @@ public class SpuInfoServiceImpl extends ServiceImpl<SpuInfoDao, SpuInfoEntity> i
             skuModel.setAttrs(attrList);
             return skuModel;
         }).collect(Collectors.toList());
-        // TODO 发送给检索服务, 写到es中
+        // 发送给检索服务, 写到es中
+        R r = elasticSearchController.up(skuModelList);
+        if (r.getCode()==0){
+            // 修改spu的发布状态
+            SpuInfoEntity spuInfoEntity = new SpuInfoEntity();
+            spuInfoEntity.setId(spuId);
+            spuInfoEntity.setPublishStatus(SpuInfoEntity.PublishStatusType.UP.getKey());
+            updateById(spuInfoEntity);
+        } else {
+            // TODO 失败 接口幂等
+        }
     }
 
 }

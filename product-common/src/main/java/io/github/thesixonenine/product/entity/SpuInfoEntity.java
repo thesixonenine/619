@@ -8,7 +8,10 @@ import com.baomidou.mybatisplus.annotation.TableName;
 import java.math.BigDecimal;
 import java.io.Serializable;
 import java.time.LocalDateTime;
+
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.Getter;
 
 /**
  * spu信息
@@ -57,4 +60,12 @@ public class SpuInfoEntity implements Serializable {
 	@TableField(fill = FieldFill.UPDATE)
 	private LocalDateTime updateTime;
 
+	@Getter
+	@AllArgsConstructor
+	public enum PublishStatusType{
+		DOWN(0,"下架"),
+		UP(1,"上架");
+		private int key;
+		private String value;
+	}
 }
