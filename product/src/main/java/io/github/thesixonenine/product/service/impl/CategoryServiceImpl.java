@@ -12,10 +12,12 @@ import io.github.thesixonenine.product.entity.CategoryBrandRelationEntity;
 import io.github.thesixonenine.product.entity.CategoryEntity;
 import io.github.thesixonenine.product.service.CategoryBrandRelationService;
 import io.github.thesixonenine.product.service.CategoryService;
+import io.github.thesixonenine.product.vo.Catalog2VO;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
@@ -94,6 +96,52 @@ public class CategoryServiceImpl extends ServiceImpl<CategoryDao, CategoryEntity
         if (CollectionUtils.isNotEmpty(list)) {
             categoryDTO.setChildren(list);
         }
+    }
+
+    /**
+     * 门户侧所需接口
+     */
+
+    @Override
+    @Cacheable(value = "catalogLevel1")
+    public List<CategoryEntity> catalogLevel1(){
+        return list(Wrappers.<CategoryEntity>lambdaQuery()
+                .eq(CategoryEntity::getParentCid, 0)
+                .eq(CategoryEntity::getCatLevel, 1)
+        );
+    }
+
+    @Override
+    @Cacheable(value = "catalog")
+    public Map<String, List<Catalog2VO>> catalog() {
+        // 查询一级分类
+        List<CategoryEntity> list = list(Wrappers.<CategoryEntity>lambdaQuery()
+                .eq(CategoryEntity::getParentCid, 0)
+                .eq(CategoryEntity::getCatLevel, 1)
+        );
+        return list.stream().collect(Collectors.toMap(k -> String.valueOf(k.getCatId()), v -> {
+            List<CategoryEntity> list2 = list(Wrappers.<CategoryEntity>lambdaQuery()
+                    .eq(CategoryEntity::getParentCid, v.getCatId())
+                    .eq(CategoryEntity::getCatLevel, 2)
+            );
+            if (CollectionUtils.isNotEmpty(list2)) {
+                return list2.stream().map(t -> {
+                    Long catId2 = t.getCatId();
+                    Catalog2VO catalog2VO = new Catalog2VO(String.valueOf(v.getCatId()), null, String.valueOf(catId2), t.getName());
+                    List<CategoryEntity> list3 = list(Wrappers.<CategoryEntity>lambdaQuery()
+                            .eq(CategoryEntity::getParentCid, catId2)
+                            .eq(CategoryEntity::getCatLevel, 3)
+                    );
+                    if (CollectionUtils.isNotEmpty(list3)) {
+                        List<Catalog2VO.Catalog3VO> catalog3VOList = list3.stream().map(item -> new Catalog2VO.Catalog3VO(String.valueOf(catId2), String.valueOf(item.getCatId()), item.getName())).collect(Collectors.toList());
+                        catalog2VO.setCatalog3List(catalog3VOList);
+                    }
+
+                    return catalog2VO;
+                }).collect(Collectors.toList());
+            }
+            return new ArrayList<>();
+        }));
     }
 
 }

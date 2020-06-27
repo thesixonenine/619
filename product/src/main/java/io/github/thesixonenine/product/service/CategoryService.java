@@ -4,6 +4,8 @@ import com.baomidou.mybatisplus.extension.service.IService;
 import io.github.thesixonenine.common.utils.PageUtils;
 import io.github.thesixonenine.product.dto.CategoryDTO;
 import io.github.thesixonenine.product.entity.CategoryEntity;
+import io.github.thesixonenine.product.vo.Catalog2VO;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
@@ -39,5 +41,15 @@ public interface CategoryService extends IService<CategoryEntity> {
      */
     @Transactional
     void updateWithBrand(CategoryEntity category);
+
+
+    /**
+     * 门户侧所需接口
+     */
+
+
+    List<CategoryEntity> catalogLevel1();
+
+    Map<String, List<Catalog2VO>> catalog();
 }
 

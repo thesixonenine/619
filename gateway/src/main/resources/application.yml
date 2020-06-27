@@ -2,12 +2,6 @@ spring:
   cloud:
     gateway:
       routes:
-      - id: path_roo_baidu_route
-        uri: https://www.baidu.com
-        # 断言规则
-        predicates:
-        - Path=/
-        # - Path=/reset/{segment},/{segment}
       # 后台的商品接口相关路由
       - id: admin_product_route
         uri: lb://product
@@ -40,6 +34,12 @@ spring:
         # filters:
         # - RewritePath=/renren-fast(?<segment>/?.*), $\{segment}
 
+
+      # 用户侧相关路由
+      - id: jdmall_route
+        uri: lb://product
+        predicates:
+          - Host=**.jdmall.com,jdmall.com
 
 
 management:
