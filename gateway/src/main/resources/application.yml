@@ -52,3 +52,10 @@ management:
       show-details: ALWAYS
 logging:
   file: C:\Users\Simple\Documents\CATALINA.BASE\619\${spring.application.name}.txt
+  level:
+    com:
+      alibaba:
+        nacos:
+          client:
+            config:
+              impl: warn
