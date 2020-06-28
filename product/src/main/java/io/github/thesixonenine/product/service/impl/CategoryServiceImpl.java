@@ -129,25 +129,43 @@ public class CategoryServiceImpl extends ServiceImpl<CategoryDao, CategoryEntity
             RLock lock = redissonClient.getLock("catalog-lock");
             log.debug("线程[{}]没有从redis中拿到数据, 等待拿锁", id);
             lock.lock();
-            String catalog1 = redisTemplate.opsForValue().get("catalog");
-            if (StringUtils.isBlank(catalog1)) {
+            try {
+                String catalog1 = redisTemplate.opsForValue().get("catalog");
+                if (StringUtils.isNotBlank(catalog1)) {
+                    log.debug("线程[{}]已拿到锁, 且已从redis中拿到数据, 直接返回", id);
+                    return new Gson().fromJson(catalog1, new TypeToken<Map<String, List<Catalog2VO>>>() {
+                    }.getType());
+                }
                 log.debug("线程[{}]已拿到锁, 但redis中没有数据, 去数据库拿数据并写入redis后释放锁", id);
                 Map<String, List<Catalog2VO>> map = getCatalogFormDB();
-
                 String s = new Gson().toJson(map);
                 redisTemplate.opsForValue().set("catalog", s, 60, TimeUnit.SECONDS);
-
-                lock.unlock();
-                log.debug("线程[{}]已释放锁并返回", id);
                 return map;
-            } else {
+            } finally {
+                log.debug("线程[{}]释放锁", id);
                 lock.unlock();
-                log.debug("线程[{}]已拿到锁, 且已从redis中拿到数据, 直接返回", id);
-
-                return new Gson().fromJson(catalog1, new TypeToken<Map<String, List<Catalog2VO>>>() {
-                }.getType());
-
             }
+
+
+            // String catalog1 = redisTemplate.opsForValue().get("catalog");
+            // if (StringUtils.isBlank(catalog1)) {
+            //     log.debug("线程[{}]已拿到锁, 但redis中没有数据, 去数据库拿数据并写入redis后释放锁", id);
+            //     Map<String, List<Catalog2VO>> map = getCatalogFormDB();
+            //
+            //     String s = new Gson().toJson(map);
+            //     redisTemplate.opsForValue().set("catalog", s, 60, TimeUnit.SECONDS);
+            //
+            //     lock.unlock();
+            //     log.debug("线程[{}]已释放锁并返回", id);
+            //     return map;
+            // } else {
+            //     lock.unlock();
+            //     log.debug("线程[{}]已拿到锁, 且已从redis中拿到数据, 直接返回", id);
+            //
+            //     return new Gson().fromJson(catalog1, new TypeToken<Map<String, List<Catalog2VO>>>() {
+            //     }.getType());
+            //
+            // }
         }
         log.debug("线程[{}]无需拿锁, 且已从redis中拿到数据, 直接返回", id);
 
