@@ -141,6 +141,7 @@ public class CategoryServiceImpl extends ServiceImpl<CategoryDao, CategoryEntity
                 log.debug("线程[{}]已释放锁并返回", id);
                 return map;
             } else {
+                lock.unlock();
                 log.debug("线程[{}]已拿到锁, 且已从redis中拿到数据, 直接返回", id);
 
                 return new Gson().fromJson(catalog1, new TypeToken<Map<String, List<Catalog2VO>>>() {
