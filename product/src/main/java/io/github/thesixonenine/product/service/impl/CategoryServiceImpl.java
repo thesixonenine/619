@@ -4,6 +4,8 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
 import io.github.thesixonenine.common.utils.PageUtils;
 import io.github.thesixonenine.common.utils.Query;
 import io.github.thesixonenine.product.dao.CategoryDao;
@@ -13,24 +15,29 @@ import io.github.thesixonenine.product.entity.CategoryEntity;
 import io.github.thesixonenine.product.service.CategoryBrandRelationService;
 import io.github.thesixonenine.product.service.CategoryService;
 import io.github.thesixonenine.product.vo.Catalog2VO;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.redisson.api.RLock;
 import org.redisson.api.RedissonClient;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.cache.annotation.Cacheable;
+import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
-
+@Slf4j
 @Service("categoryService")
 public class CategoryServiceImpl extends ServiceImpl<CategoryDao, CategoryEntity> implements CategoryService {
     @Autowired
     private CategoryBrandRelationService categoryBrandRelationService;
     @Autowired
     private RedissonClient redissonClient;
+    @Autowired
+    private StringRedisTemplate redisTemplate;
 
     @Override
     public PageUtils queryPage(Map<String, Object> params) {
@@ -106,7 +113,6 @@ public class CategoryServiceImpl extends ServiceImpl<CategoryDao, CategoryEntity
      */
 
     @Override
-    @Cacheable(value = "catalogLevel1")
     public List<CategoryEntity> catalogLevel1() {
         return list(Wrappers.<CategoryEntity>lambdaQuery()
                 .eq(CategoryEntity::getParentCid, 0)
@@ -115,9 +121,37 @@ public class CategoryServiceImpl extends ServiceImpl<CategoryDao, CategoryEntity
     }
 
     @Override
-    @Cacheable(value = "catalog")
     public Map<String, List<Catalog2VO>> catalog() {
-        return getCatalogFormDB();
+        long id = Thread.currentThread().getId();
+        String catalog = redisTemplate.opsForValue().get("catalog");
+        if (StringUtils.isBlank(catalog)) {
+            // 需要从数据库中拿, 但是要加分布式锁
+            RLock lock = redissonClient.getLock("catalog-lock");
+            log.debug("线程[{}]没有从redis中拿到数据, 等待拿锁", id);
+            lock.lock();
+            String catalog1 = redisTemplate.opsForValue().get("catalog");
+            if (StringUtils.isBlank(catalog1)) {
+                log.debug("线程[{}]已拿到锁, 但redis中没有数据, 去数据库拿数据并写入redis后释放锁", id);
+                Map<String, List<Catalog2VO>> map = getCatalogFormDB();
+
+                String s = new Gson().toJson(map);
+                redisTemplate.opsForValue().set("catalog", s, 60, TimeUnit.SECONDS);
+
+                lock.unlock();
+                log.debug("线程[{}]已释放锁并返回", id);
+                return map;
+            } else {
+                log.debug("线程[{}]已拿到锁, 且已从redis中拿到数据, 直接返回", id);
+
+                return new Gson().fromJson(catalog1, new TypeToken<Map<String, List<Catalog2VO>>>() {
+                }.getType());
+
+            }
+        }
+        log.debug("线程[{}]无需拿锁, 且已从redis中拿到数据, 直接返回", id);
+
+        return new Gson().fromJson(catalog, new TypeToken<Map<String, List<Catalog2VO>>>() {
+        }.getType());
     }
 
     private Map<String, List<Catalog2VO>> getCatalogFormRedis() {
@@ -132,6 +166,7 @@ public class CategoryServiceImpl extends ServiceImpl<CategoryDao, CategoryEntity
     }
 
     private Map<String, List<Catalog2VO>> getCatalogFormDB() {
+        log.debug("线程[{}]执行数据库查询", Thread.currentThread().getId());
         // 查询一级分类
         List<CategoryEntity> list = list(Wrappers.<CategoryEntity>lambdaQuery()
                 .eq(CategoryEntity::getParentCid, 0)

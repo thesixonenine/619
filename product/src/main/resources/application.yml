@@ -56,6 +56,8 @@ management:
 logging:
   file: C:\Users\Simple\Documents\CATALINA.BASE\619\${spring.application.name}.txt
   level:
+    springfox:
+      documentation: warn
     io:
       github:
         thesixonenine:
