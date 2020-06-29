@@ -22,6 +22,7 @@ import org.redisson.api.RLock;
 import org.redisson.api.RedissonClient;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
 
@@ -120,7 +121,23 @@ public class CategoryServiceImpl extends ServiceImpl<CategoryDao, CategoryEntity
         );
     }
 
+    /**
+     * 读:
+     *     1. 缓存穿透: 查询一个null数据(缓存空数据)
+     *     2. 缓存击穿: 并发查询一个刚过期的数据(加分布式锁, 默认是不加锁的sync = false  设置为true, 则读方法是synchronized的[在实例不多时也可])
+     *     3. 缓存雪崩: 大量key同时过期(加随机时间, 注意可能 3s + 1s = 2s + 2s = 都是4s后过期, 由于存的时间不一样, 只要指定过期时间即可)
+     * 写:
+     *     1. 加读写锁(读多写少)
+     *     2. 引入Canal
+     *     3. 读多写多, 直接数据库查
+     * 常规数据: 读多写少, 及时性, 一致性要求不高, 可以使用Spring-Cache(写模式一定要设置过期时间, 等待查询自动设置缓存)
+     * 特殊数据: 及时性要求高->特殊处理 读写锁, Canal等
+     *
+     * @return 分类数据
+     */
     @Override
+    @Cacheable(cacheNames = "catalog", key = "#root.methodName", sync = false)
+    // @Cacheable(cacheNames = "catalog", key = "'keyname'")
     public Map<String, List<Catalog2VO>> catalog() {
         long id = Thread.currentThread().getId();
         String catalog = redisTemplate.opsForValue().get("catalog");
