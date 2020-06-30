@@ -36,11 +36,14 @@ spring:
 
 
       # 用户侧相关路由
-      - id: jdmall_route
+      - id: jdmall_index_route
         uri: lb://product
         predicates:
-          - Host=**.jdmall.com,jdmall.com
-
+          - Host=jdmall.com
+      - id: jdmall_search_route
+        uri: lb://search
+        predicates:
+          - Host=search.jdmall.com
 
 management:
   endpoints:

@@ -4,6 +4,7 @@ import com.google.gson.Gson;
 import io.github.thesixonenine.common.es.SkuModel;
 import io.github.thesixonenine.search.service.ElasticSearchService;
 import io.github.thesixonenine.search.util.Const;
+import io.github.thesixonenine.search.vo.SearchCondition;
 import lombok.extern.slf4j.Slf4j;
 import org.elasticsearch.action.bulk.BulkItemResponse;
 import org.elasticsearch.action.bulk.BulkRequest;
@@ -55,5 +56,10 @@ public class ElasticSearchServiceImpl implements ElasticSearchService {
             log.error("商品上架错误[{}]", s);
         }
         return !hasFailures;
+    }
+
+    @Override
+    public void search(SearchCondition condition) {
+
     }
 }

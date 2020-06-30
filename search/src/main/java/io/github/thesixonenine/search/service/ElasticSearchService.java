@@ -1,6 +1,7 @@
 package io.github.thesixonenine.search.service;
 
 import io.github.thesixonenine.common.es.SkuModel;
+import io.github.thesixonenine.search.vo.SearchCondition;
 
 import java.io.IOException;
 import java.util.List;
@@ -13,4 +14,9 @@ import java.util.List;
  */
 public interface ElasticSearchService {
     boolean up(List<SkuModel> skuModelList) throws IOException;
+
+    /**
+     * 主要检索
+     */
+    void search(SearchCondition condition);
 }

@@ -1,6 +1,8 @@
 spring:
   main:
     allow-bean-definition-overriding: true
+  thymeleaf:
+    cache: false
 server:
   port: 20000
   undertow:
