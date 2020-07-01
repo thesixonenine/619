@@ -24,6 +24,7 @@ import io.github.thesixonenine.product.service.*;
 import io.github.thesixonenine.search.controller.ElasticSearchController;
 import io.github.thesixonenine.ware.controller.WareSkuController;
 import io.github.thesixonenine.ware.entity.WareSkuEntity;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.BeanUtils;
@@ -34,10 +35,11 @@ import java.math.BigDecimal;
 import java.util.*;
 import java.util.stream.Collectors;
 
-
+@Slf4j
 @Service("spuInfoService")
 public class SpuInfoServiceImpl extends ServiceImpl<SpuInfoDao, SpuInfoEntity> implements SpuInfoService {
-
+    @Autowired
+    private SpuInfoService spuInfoService;
     @Autowired
     private SpuInfoDescService spuInfoDescService;
     @Autowired
@@ -225,13 +227,23 @@ public class SpuInfoServiceImpl extends ServiceImpl<SpuInfoDao, SpuInfoEntity> i
 
     @Override
     public void up(Long spuId) {
+        SpuInfoEntity byId = spuInfoService.getById(spuId);
+        if (Objects.isNull(byId)) {
+            log.warn("spuId[{}]不存在", spuId);
+            return;
+        }
+        if (SpuInfoEntity.PublishStatusType.UP.getKey() == byId.getPublishStatus()) {
+            log.warn("spuId[{}]已上架", spuId);
+            return;
+        }
+
         List<SkuInfoEntity> skuInfoEntityList = skuInfoService.list(Wrappers.<SkuInfoEntity>lambdaQuery().eq(SkuInfoEntity::getSpuId, spuId));
         if (CollectionUtils.isEmpty(skuInfoEntityList)) {
             return;
         }
 
         // 查询品牌的信息 brandService
-        List<Long> brandIdList = skuInfoEntityList.stream().filter(Objects::nonNull).map(SkuInfoEntity::getBrandId).filter(Objects::nonNull).filter(t -> t > 0L).collect(Collectors.toList());
+        List<Long> brandIdList = skuInfoEntityList.stream().filter(Objects::nonNull).map(SkuInfoEntity::getBrandId).filter(Objects::nonNull).filter(t -> t > 0L).distinct().collect(Collectors.toList());
         Map<Long, BrandEntity> brandMap = new HashMap<>();
         if (CollectionUtils.isNotEmpty(brandIdList)) {
             brandService.list(Wrappers.<BrandEntity>lambdaQuery()
@@ -241,7 +253,7 @@ public class SpuInfoServiceImpl extends ServiceImpl<SpuInfoDao, SpuInfoEntity> i
         }
 
         // 查询分类的信息 categoryService
-        List<Long> catalogIdList = skuInfoEntityList.stream().filter(Objects::nonNull).map(SkuInfoEntity::getCatalogId).filter(Objects::nonNull).filter(t -> t > 0L).collect(Collectors.toList());
+        List<Long> catalogIdList = skuInfoEntityList.stream().filter(Objects::nonNull).map(SkuInfoEntity::getCatalogId).filter(Objects::nonNull).filter(t -> t > 0L).distinct().collect(Collectors.toList());
         Map<Long, String> catalogMap = new HashMap<>();
         if (CollectionUtils.isNotEmpty(catalogIdList)) {
             categoryService.list(Wrappers.<CategoryEntity>lambdaQuery()
@@ -256,10 +268,12 @@ public class SpuInfoServiceImpl extends ServiceImpl<SpuInfoDao, SpuInfoEntity> i
         if (CollectionUtils.isNotEmpty(productAttrValueEntityList)) {
             List<Long> attrIdList = productAttrValueEntityList.stream().map(ProductAttrValueEntity::getAttrId).collect(Collectors.toList());
             if (CollectionUtils.isNotEmpty(attrIdList)) {
-                attrService.list(Wrappers.<AttrEntity>lambdaQuery()
+                List<Long> canSearchAttrIdList = attrService.list(Wrappers.<AttrEntity>lambdaQuery()
+                        .select(AttrEntity::getAttrId)
                         .in(AttrEntity::getAttrId, attrIdList)
                         .eq(AttrEntity::getSearchType, AttrEntity.SearchType.ENABLE.getKey())
-                ).forEach(t -> {
+                ).stream().map(AttrEntity::getAttrId).collect(Collectors.toList());
+                productAttrValueEntityList.stream().filter(t -> canSearchAttrIdList.contains(t.getAttrId())).forEach(t->{
                     SkuModel.Attr attr = new SkuModel.Attr();
                     BeanUtils.copyProperties(t, attr);
                     attrList.add(attr);
@@ -272,7 +286,8 @@ public class SpuInfoServiceImpl extends ServiceImpl<SpuInfoDao, SpuInfoEntity> i
         Map<Long, Integer> skuStock = new HashMap<>();
         if (CollectionUtils.isNotEmpty(skuIdList)) {
             R r = wareSkuController.listByIds(skuIdList);
-            List<WareSkuEntity> list = r.getData(new TypeToken<List<WareSkuEntity>>() {});
+            List<WareSkuEntity> list = r.getData(new TypeToken<List<WareSkuEntity>>() {
+            });
             if (CollectionUtils.isNotEmpty(list)) {
                 list.stream().collect(Collectors.groupingBy(WareSkuEntity::getSkuId)
                 ).forEach((key, value) -> {
@@ -302,7 +317,7 @@ public class SpuInfoServiceImpl extends ServiceImpl<SpuInfoDao, SpuInfoEntity> i
         }).collect(Collectors.toList());
         // 发送给检索服务, 写到es中
         R r = elasticSearchController.up(skuModelList);
-        if (r.getCode()==0){
+        if (r.getCode() == 0) {
             // 修改spu的发布状态
             SpuInfoEntity spuInfoEntity = new SpuInfoEntity();
             spuInfoEntity.setId(spuId);

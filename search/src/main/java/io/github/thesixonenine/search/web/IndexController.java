@@ -2,10 +2,11 @@ package io.github.thesixonenine.search.web;
 
 import io.github.thesixonenine.search.service.ElasticSearchService;
 import io.github.thesixonenine.search.vo.SearchCondition;
+import io.github.thesixonenine.search.vo.SearchResp;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestBody;
 
 /**
  * @author Simple
@@ -20,8 +21,9 @@ public class IndexController {
     private ElasticSearchService elasticSearchService;
 
     @GetMapping(value = {"", "/search.html"})
-    public String search(@RequestBody SearchCondition condition){
-        elasticSearchService.search(condition);
+    public String search(SearchCondition condition, Model model) {
+        SearchResp resp = elasticSearchService.search(condition);
+        model.addAttribute("result", resp);
         return "search";
     }
 }

@@ -2,6 +2,7 @@ package io.github.thesixonenine.search.service;
 
 import io.github.thesixonenine.common.es.SkuModel;
 import io.github.thesixonenine.search.vo.SearchCondition;
+import io.github.thesixonenine.search.vo.SearchResp;
 
 import java.io.IOException;
 import java.util.List;
@@ -18,5 +19,5 @@ public interface ElasticSearchService {
     /**
      * 主要检索
      */
-    void search(SearchCondition condition);
+    SearchResp search(SearchCondition condition);
 }

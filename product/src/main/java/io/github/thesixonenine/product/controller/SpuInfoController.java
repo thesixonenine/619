@@ -5,6 +5,7 @@ import io.github.thesixonenine.common.utils.R;
 import io.github.thesixonenine.product.dto.SpuInfoDTO;
 import io.github.thesixonenine.product.entity.SpuInfoEntity;
 import io.github.thesixonenine.product.service.SpuInfoService;
+import io.swagger.annotations.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -18,6 +19,7 @@ import java.util.Map;
  * @author thesixonenine
  * @date 2020-06-06 00:59:35
  */
+@Api(value = "spu信息")
 @RestController
 @RequestMapping("product/spuinfo")
 public class SpuInfoController {
@@ -81,6 +83,10 @@ public class SpuInfoController {
     /**
      * 上架
      */
+    @ApiOperation(value = "上架")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "spuId", value = "spuId")
+    })
     @GetMapping(value = "/{spuId}/up")
     public R up(@PathVariable("spuId") Long spuId){
         spuInfoService.up(spuId);
