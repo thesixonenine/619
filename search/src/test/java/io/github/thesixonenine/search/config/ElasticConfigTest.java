@@ -28,6 +28,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
 
+import javax.annotation.Resource;
 import java.io.IOException;
 import java.math.BigDecimal;
 
@@ -35,7 +36,7 @@ import java.math.BigDecimal;
 @SpringBootTest
 public class ElasticConfigTest {
 
-    @Autowired
+    @Resource
     private RestHighLevelClient client;
     private static final ObjectMapper objectMapper = new ObjectMapper();
     private static final Gson gson = new GsonBuilder().setPrettyPrinting().create();

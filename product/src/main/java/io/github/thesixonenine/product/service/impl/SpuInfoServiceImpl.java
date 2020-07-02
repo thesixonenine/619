@@ -247,7 +247,7 @@ public class SpuInfoServiceImpl extends ServiceImpl<SpuInfoDao, SpuInfoEntity> i
         Map<Long, BrandEntity> brandMap = new HashMap<>();
         if (CollectionUtils.isNotEmpty(brandIdList)) {
             brandService.list(Wrappers.<BrandEntity>lambdaQuery()
-                    .select(BrandEntity::getBrandId, BrandEntity::getName)
+                    .select(BrandEntity::getBrandId, BrandEntity::getName, BrandEntity::getLogo)
                     .in(BrandEntity::getBrandId, brandIdList)
             ).stream().collect(Collectors.toMap(BrandEntity::getBrandId, v -> v)).forEach(brandMap::put);
         }

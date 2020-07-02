@@ -42,9 +42,7 @@ PUT product
         "type": "keyword"
       },
       "brandImg": {
-        "type": "keyword",
-        "index": false,
-        "doc_values": false
+        "type": "keyword"
       },
       "categoryName": {
         "type": "keyword"
@@ -183,7 +181,7 @@ GET product/_search
     "fields": {
       "skuTitle": {}
     },
-    "pre_tags": "<b stype='color:red'>",
+    "pre_tags": "<b style='color:red'>",
     "post_tags": "</b>"
   },
   "aggs": {
@@ -196,6 +194,12 @@ GET product/_search
         "brand_name_agg": {
           "terms": {
             "field": "brandName",
+            "size": 10
+          }
+        },
+        "brand_img_agg": {
+          "terms": {
+            "field": "brandImg",
             "size": 10
           }
         }

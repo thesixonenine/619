@@ -43,7 +43,7 @@ public class SearchResp {
     /**
      * 查询结果中涉及到的分类
      */
-    private List<catalogVO> catalogs;
+    private List<CatalogVO> catalogs;
 
     /**
      * 查询结果中涉及到的属性
@@ -58,13 +58,13 @@ public class SearchResp {
     }
 
     @Data
-    private static class catalogVO {
+    public static class CatalogVO {
         private Long catalogId;
         private String categoryName;
     }
 
     @Data
-    private static class AttrVO {
+    public static class AttrVO {
         private Long attrId;
         private String attrName;
         private List<String> attrValue;
