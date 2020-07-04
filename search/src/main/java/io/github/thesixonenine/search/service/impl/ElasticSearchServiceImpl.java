@@ -95,8 +95,7 @@ public class ElasticSearchServiceImpl implements ElasticSearchService {
         // 3. 执行检索
         try {
             SearchResponse response = client.search(searchRequest, RequestOptions.DEFAULT);
-            SearchResp resp = buildResponse(response, condition);
-            return resp;
+            return buildResponse(response, condition);
         } catch (Exception ignored) {
 
         }
