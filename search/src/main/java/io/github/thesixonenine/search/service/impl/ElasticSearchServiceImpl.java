@@ -294,6 +294,12 @@ public class ElasticSearchServiceImpl implements ElasticSearchService {
         resp.setTotal(total);
         // 总页码
         resp.setTotalPages((int) (total % PAGE_SIZE == 0 ? total / PAGE_SIZE : total / PAGE_SIZE + 1));
+
+        List<Integer> pageNavs = new ArrayList<>();
+        for (int i = 1; i <= resp.getTotalPages(); i++) {
+            pageNavs.add(i);
+        }
+        resp.setPageNavs(pageNavs);
         return resp;
     }
 }

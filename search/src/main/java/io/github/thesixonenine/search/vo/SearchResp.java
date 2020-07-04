@@ -13,7 +13,9 @@ import java.util.List;
  */
 @Data
 public class SearchResp {
-    // 查询到的商品信息
+    /**
+     * 查询到的商品信息
+     */
     private List<SkuModel> skuList;
 
     /*
@@ -34,6 +36,7 @@ public class SearchResp {
      * 总页码
      */
     private Integer totalPages;
+    private List<Integer> pageNavs;
 
     /**
      * 查询结果中涉及到的品牌
