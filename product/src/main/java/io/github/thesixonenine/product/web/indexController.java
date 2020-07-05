@@ -10,6 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import java.util.List;
@@ -60,4 +61,19 @@ public class indexController {
 
         return "Hi";
     }
+
+
+
+    @GetMapping(value = {"/{skuId}.html"})
+    public String item(@PathVariable(value = "skuId") Long skuId, Model model) {
+        log.info("进入item");
+        // 查询一级分类
+        // List<CategoryEntity> list = categoryService.catalogLevel1();
+        // model.addAttribute("categorys", list);
+        return "item";
+    }
+
+
+
+
 }
