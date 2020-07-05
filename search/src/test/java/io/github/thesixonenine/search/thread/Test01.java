@@ -52,6 +52,10 @@ public class Test01 {
         //    2.3. maximumPoolSize大于corePoolSize的线程执行完后, 等待超过keepAliveTime的时间后自动销毁, 最终保持到corePoolSize大小
         //    2.4. maximumPoolSize满了, 新进来的任务就使用RejectedExecutionHandler的拒绝策略来拒绝任务
         // 3. 所有的线程都是由指定的ThreadFactory来进行创建的
+
+        // 一个线程池 core=7, max=20, queue=50  100个并发进来:
+        // 7个会立即执行, 50个进入队列, 再新开13个线程执行, 剩下的30个使用拒绝策略来拒绝
+        threadPool = new ThreadPoolExecutor(5, 20, 10, TimeUnit.SECONDS, new LinkedBlockingQueue<>(5), Executors.defaultThreadFactory(), new ThreadPoolExecutor.AbortPolicy());
     }
     public static void main(String[] args) {
         System.out.println("main_start");
