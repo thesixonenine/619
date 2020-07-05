@@ -2,7 +2,9 @@ package io.github.thesixonenine.product.web;
 
 import io.github.thesixonenine.product.entity.CategoryEntity;
 import io.github.thesixonenine.product.service.CategoryService;
+import io.github.thesixonenine.product.service.SkuInfoService;
 import io.github.thesixonenine.product.vo.Catalog2VO;
+import io.github.thesixonenine.product.vo.ItemVO;
 import lombok.extern.slf4j.Slf4j;
 import org.redisson.api.RLock;
 import org.redisson.api.RedissonClient;
@@ -27,6 +29,8 @@ import java.util.Map;
 public class indexController {
     @Autowired
     private CategoryService categoryService;
+    @Autowired
+    private SkuInfoService skuInfoService;
 
     @GetMapping(value = {"/", "/index.html"})
     public String index(Model model) {
@@ -66,10 +70,9 @@ public class indexController {
 
     @GetMapping(value = {"/{skuId}.html"})
     public String item(@PathVariable(value = "skuId") Long skuId, Model model) {
-        log.info("进入item");
-        // 查询一级分类
-        // List<CategoryEntity> list = categoryService.catalogLevel1();
-        // model.addAttribute("categorys", list);
+        // 查询VO
+        ItemVO vo = skuInfoService.item(skuId);
+        model.addAttribute("result", vo);
         return "item";
     }
 

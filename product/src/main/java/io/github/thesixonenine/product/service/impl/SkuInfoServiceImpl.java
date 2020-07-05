@@ -1,5 +1,6 @@
 package io.github.thesixonenine.product.service.impl;
 
+import io.github.thesixonenine.product.vo.ItemVO;
 import org.springframework.stereotype.Service;
 import java.util.Map;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
@@ -24,6 +25,16 @@ public class SkuInfoServiceImpl extends ServiceImpl<SkuInfoDao, SkuInfoEntity> i
         );
 
         return new PageUtils(page);
+    }
+
+    @Override
+    public ItemVO item(Long skuId) {
+        // 1. sku基本信息 pms_sku_info
+        // 2. sku图片信息 pms_sku_images
+        // 3. spu销售属性
+        // 4. spu介绍信息
+        // 5. spu规格参数
+        return null;
     }
 
 }
