@@ -52,6 +52,7 @@ public class AttrGroupServiceImpl extends ServiceImpl<AttrGroupDao, AttrGroupEnt
             AttrGroupVO vo = new AttrGroupVO();
             BeanUtils.copyProperties(attrGroupEntity, vo);
             vo.setAttrs(map.get(vo.getAttrGroupId()));
+            voList.add(vo);
         }
         return voList;
     }
