@@ -62,7 +62,7 @@ public class SkuInfoServiceImpl extends ServiceImpl<SkuInfoDao, SkuInfoEntity> i
         vo.setImages(skuImagesEntityList);
         Long spuId = skuInfoEntity.getSpuId();
         Long catalogId = skuInfoEntity.getCatalogId();
-        // 3. spu销售属性
+        // 3. TODO spu销售属性
         List<ItemSaleAttrsVO> saleAttrsList = new ArrayList<>();
         vo.setSaleAttrsList(saleAttrsList);
         // 4. spu介绍信息
@@ -70,7 +70,7 @@ public class SkuInfoServiceImpl extends ServiceImpl<SkuInfoDao, SkuInfoEntity> i
         vo.setDesc(spuInfoDescEntity);
         // 5. spu规格参数
         List<ProductAttrValueEntity> productAttrValueEntityList = productAttrValueService.list(Wrappers.<ProductAttrValueEntity>lambdaQuery().eq(ProductAttrValueEntity::getSpuId, spuId));
-        Map<Long, ProductAttrValueEntity> map = productAttrValueEntityList.stream().collect(Collectors.toMap(k -> k.getAttrId(), v -> v));
+        Map<Long, ProductAttrValueEntity> map = productAttrValueEntityList.stream().collect(Collectors.toMap(ProductAttrValueEntity::getAttrId, v -> v));
         List<Long> attrIdList = productAttrValueEntityList.stream().map(ProductAttrValueEntity::getAttrId).filter(Objects::nonNull).distinct().collect(Collectors.toList());
         List<AttrAttrgroupRelationEntity> relationList = attrAttrgroupRelationService.list(Wrappers.<AttrAttrgroupRelationEntity>lambdaQuery().in(AttrAttrgroupRelationEntity::getAttrId, attrIdList));
         List<Long> list = relationList.stream().map(AttrAttrgroupRelationEntity::getAttrGroupId).filter(Objects::nonNull).distinct().collect(Collectors.toList());
@@ -79,10 +79,7 @@ public class SkuInfoServiceImpl extends ServiceImpl<SkuInfoDao, SkuInfoEntity> i
         attrGroupEntityList.forEach(attrGroup->{
             ItemAttrGroupVO attrGroupVO = new ItemAttrGroupVO();
             attrGroupVO.setGroupName(attrGroup.getAttrGroupName());
-
-            List<Long> collect = relationList.stream().filter(t -> t.getAttrGroupId().equals(attrGroup.getAttrGroupId())).map(t -> t.getAttrId()).distinct().collect(Collectors.toList());
-
-
+            List<Long> collect = relationList.stream().filter(t -> t.getAttrGroupId().equals(attrGroup.getAttrGroupId())).map(AttrAttrgroupRelationEntity::getAttrId).distinct().collect(Collectors.toList());
             List<BaseAttrVO> baseAttrVOList = new ArrayList<>();
             collect.forEach(t->{
                 ProductAttrValueEntity valueEntity = map.get(t);
