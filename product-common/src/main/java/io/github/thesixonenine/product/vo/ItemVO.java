@@ -16,6 +16,7 @@ import java.util.List;
 @Data
 public class ItemVO {
     private SkuInfoEntity skuInfoEntity;
+    private Boolean hasStock = true;
     private List<SkuImagesEntity> images;
     private List<ItemSaleAttrsVO> saleAttrsList;
     private SpuInfoDescEntity desc;

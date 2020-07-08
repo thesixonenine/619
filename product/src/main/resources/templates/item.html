@@ -101,11 +101,11 @@
 
 					<div class="imgbox">
 						<div class="probox">
-							<img class="img1" alt="" th:src="${skuInfo?.skuDefaultImg}"  src="/img/59ded626N7c4cb0a3.jpg">
+							<img class="img1" alt="" th:src="${result.skuInfoEntity.skuDefaultImg}"  src="/static/product/img/59ded626N7c4cb0a3.jpg">
 							<div class="hoverbox"></div>
 						</div>
 						<div class="showbox">
-							<img class="img1" alt="" th:src="${skuInfo?.skuDefaultImg}" src="/img/59ded626N7c4cb0a3.jpg">
+							<img class="img1" alt="" th:src="${result.skuInfoEntity.skuDefaultImg}" src="/static/product/img/59ded626N7c4cb0a3.jpg">
 						</div>
 					</div>
 
@@ -113,17 +113,8 @@
 
 						<div class="box-lh-one">
 							<ul>
-								<li th:each="skuImage:${skuInfo?.skuImageList}">
+								<li th:each="skuImage:${result.images}" th:if="${!#strings.isEmpty(skuImage.imgUrl)}">
 								 		<img th:src="${skuImage.imgUrl}"/>
-<!--								<li><img src="/img/59ded62eN64a9784c.jpg" /></li>
-								<li><img src="/img/59ded626Ne3c69b70.jpg" /></li>
-								<li><img src="/img/59ded626N7c4cb0a3.jpg" /></li>
-								<li><img src="/img/59ded626Ne3c69b70.jpg" /></li>
-								<li><img src="/img/59ded62dN7e28abc5 (1).jpg" /></li>
-								<li><img src="/img/59ded62cN6e9ac17c.jpg" /></li>
-								<li><img src="/img/59ded620Nfc0ab489.jpg" /></li>
-								<li><img src="/img/59ded60eN3110f3a8.jpg" /></li>
-								<li><img src="/img/59ded62dNfed003a8.jpg" /></li>-->
 								</li>
 							</ul>
 						</div>
@@ -148,7 +139,7 @@
 
 					</div>
 					<div class="box-two">
-						<div class="box-name" th:text="${skuInfo?.skuName}">
+						<div class="box-name" th:text="${result.skuInfoEntity.skuName}">
 							华为 HUAWEI Mate 10 6GB+128GB 亮黑色 移动联通电信4G手机 双卡双待
 						</div>
  
@@ -172,7 +163,7 @@
 								<li>惊喜价</li>
 								<li>
 									<span>￥</span>
-									<span th:text="${skuInfo?.price}">4499.00</span>
+									<span th:text="${#numbers.formatDecimal(result.skuInfoEntity.price, 1, 2)}">4499.00</span>
 								</li>
 								<li>
 								 
@@ -198,34 +189,34 @@
 
 								</li>
 								<li>
-									<span>无货</span>， 此商品暂时售完
+									<span th:text="${result.hasStock?'有货':'无货'}">无货</span>， 此商品暂时售完
 								</li>
  
 							</ul>
 						</div>
-						 <div class="box-stock">
-							<ul class="box-ul">
-								<li>重  量:</li>
-								<li class="box-stock-li">
-									<div class="box-stock-one">
-									</div>
- 
+<!--						 <div class="box-stock">-->
+<!--							<ul class="box-ul">-->
+<!--								<li>重  量:</li>-->
+<!--								<li class="box-stock-li">-->
+<!--									<div class="box-stock-one">-->
+<!--									</div>-->
+<!-- -->
 
-								</li>
-								<li  th:text="${skuInfo?.weight}+' kg'">
-									  10 kg
-								</li>
- 
-							</ul>
-						</div>
+<!--								</li>-->
+<!--								<li  >-->
+<!--									  10 kg-->
+<!--								</li>-->
+<!-- -->
+<!--							</ul>-->
+<!--						</div>-->
 						  
 						<div class="box-attr-3">
 						<br/>
-							<div class="box-attr-2 clear"  th:each="spuSaleAttr:${spuSaleAttrListCheckBySku}">
+							<div class="box-attr-2 clear"  th:each="spuSaleAttr:${result.saleAttrsList}">
 								<dl>
-									<dt th:text="${spuSaleAttr.saleAttrName}">选择颜色</dt>
-									<dd  th:class="redborder" th:each="saleAttrValue:${spuSaleAttr.spuSaleAttrValueList}">
-										<div th:value="${saleAttrValue.id}" th:text="${saleAttrValue.saleAttrValueName}">
+									<dt th:text="${spuSaleAttr.attrName}">选择颜色</dt>
+									<dd  th:class="redborder" th:each="saleAttrValue:${spuSaleAttr.attrValues}">
+										<div th:value="${spuSaleAttr.attrId}" th:text="${saleAttrValue}">
 											  摩卡金
 										</div>
 									</dd>
@@ -451,7 +442,7 @@
 											</td>
 										</tr>
 									</table>
-									<img class="xiaoguo" src="/img/5a0d4181Nf70c5ebf.jpg" />
+									<img class="xiaoguo" th:each="desc:${#strings.listSplit(result.desc.decript,',')}" th:src="${desc}" />
 									<div class="guiGebox guiGebox1">
 										<div class="guiGe">
 											<h3>主体</h3>
@@ -993,7 +984,7 @@
 		</div>
 
 
-		<input id="skuId" type="text"  th:value= " ${skuInfo?.id}"  />
+		<input id="skuId" type="text"  th:value= " ${result.skuInfoEntity.skuId}"  />
 
 		<div class="Fixedbian">
 			<ul>
