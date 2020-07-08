@@ -79,3 +79,8 @@ logging:
           client:
             config:
               impl: warn
+
+thread:
+  core-pool-size: 20
+  maximum-pool-size: 50
+  keep-alive-time: 10
