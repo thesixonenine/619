@@ -7,6 +7,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
 
+import java.util.concurrent.ExecutionException;
+
 import static org.junit.Assert.*;
 @RunWith(SpringRunner.class)
 @SpringBootTest
@@ -16,7 +18,7 @@ public class SkuInfoServiceImplTest {
     private SkuInfoService skuInfoService;
 
     @Test
-    public void testItem(){
+    public void testItem() throws ExecutionException, InterruptedException {
         skuInfoService.item(1L);
     }
 }

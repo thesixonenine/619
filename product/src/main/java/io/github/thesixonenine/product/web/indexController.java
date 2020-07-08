@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ExecutionException;
 
 /**
  * @author Simple
@@ -69,7 +70,7 @@ public class indexController {
 
 
     @GetMapping(value = {"/{skuId}.html"})
-    public String item(@PathVariable(value = "skuId") Long skuId, Model model) {
+    public String item(@PathVariable(value = "skuId") Long skuId, Model model) throws ExecutionException, InterruptedException {
         // 查询VO
         ItemVO vo = skuInfoService.item(skuId);
         model.addAttribute("result", vo);
