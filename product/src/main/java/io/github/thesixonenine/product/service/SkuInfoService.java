@@ -6,6 +6,7 @@ import io.github.thesixonenine.product.entity.SkuInfoEntity;
 import io.github.thesixonenine.product.vo.ItemVO;
 
 import java.util.Map;
+import java.util.concurrent.ExecutionException;
 
 /**
  * sku信息
@@ -17,6 +18,6 @@ public interface SkuInfoService extends IService<SkuInfoEntity> {
 
     PageUtils queryPage(Map<String, Object> params);
 
-    ItemVO item(Long skuId);
+    ItemVO item(Long skuId) throws ExecutionException, InterruptedException;
 }
 
