@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.util.Arrays;
 import java.util.Map;
+import java.util.Objects;
 
 /**
  * @author Simple
@@ -83,5 +84,14 @@ public class MemberControllerImpl implements MemberController {
             R.error(10001, e.getMessage());
         }
         return R.ok();
+    }
+
+    @Override
+    public R login(String username, String password) {
+        MemberEntity member = memberService.login(username, password);
+        if (Objects.isNull(member)) {
+            return R.error(10001, "登录失败, 用户名或密码错误");
+        }
+        return R.ok().setData(member);
     }
 }

@@ -59,4 +59,15 @@ public interface MemberController {
     R register(@RequestParam("username") String username,
                @RequestParam("password") String password,
                @RequestParam("phone") String phone);
+
+    /**
+     * 登录
+     *
+     * @param username 账号
+     * @param password 密码
+     * @return 通用返回
+     */
+    @GetMapping(value = "/member/member/login")
+    R login(@RequestParam("username") String username,
+            @RequestParam("password") String password);
 }

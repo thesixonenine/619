@@ -1,6 +1,7 @@
 package io.github.thesixonenine.auth.web;
 
 import com.google.gson.reflect.TypeToken;
+import io.github.thesixonenine.auth.vo.UserLoginVO;
 import io.github.thesixonenine.auth.vo.UserRegisterVO;
 import io.github.thesixonenine.common.utils.R;
 import io.github.thesixonenine.member.controller.MemberController;
@@ -112,5 +113,18 @@ public class IndexController {
             redirectAttributes.addFlashAttribute("errors", map);
             return "redirect:http://auth.jdmall.com/reg";
         }
+    }
+
+    @PostMapping(value = "/signin")
+    public String login(@Valid UserLoginVO userLoginVO, RedirectAttributes redirectAttributes) {
+        // 远程登录
+        R r = memberController.login(userLoginVO.getUsername(), userLoginVO.getPassword());
+        if (r.getCode() != 0) {
+            Map<String, String> map = new HashMap<>(1);
+            map.put("msg", (String) r.get("msg"));
+            redirectAttributes.addFlashAttribute("errors", map);
+            return "redirect:http://auth.jdmall.com/login";
+        }
+        return "redirect:http://jdmall.com";
     }
 }

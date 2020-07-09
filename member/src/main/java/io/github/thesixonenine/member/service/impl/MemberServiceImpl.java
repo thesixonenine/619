@@ -57,4 +57,11 @@ public class MemberServiceImpl extends ServiceImpl<MemberDao, MemberEntity> impl
         save(member);
     }
 
+    @Override
+    public MemberEntity login(String username, String password) {
+        return getOne(Wrappers.<MemberEntity>lambdaQuery()
+                .eq(MemberEntity::getPassword, password)
+                .and((r) -> r.eq(MemberEntity::getUsername, username).or().eq(MemberEntity::getMobile, username)));
+    }
+
 }
