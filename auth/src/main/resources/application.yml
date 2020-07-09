@@ -41,5 +41,10 @@ logging:
             config:
               impl: warn
 spring:
+  redis:
+    host: 192.168.137.10
+    port: 6379
   thymeleaf:
     cache: false
+auth:
+  sms-code: 123456

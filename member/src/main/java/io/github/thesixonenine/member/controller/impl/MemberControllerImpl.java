@@ -28,6 +28,7 @@ public class MemberControllerImpl implements MemberController {
     /**
      * 列表
      */
+    @Override
     public R list(Map<String, Object> params) {
         R r = couponController.list(params);
         System.out.println(r);
@@ -41,6 +42,7 @@ public class MemberControllerImpl implements MemberController {
     /**
      * 信息
      */
+    @Override
     public R info(Long id) {
         MemberEntity member = memberService.getById(id);
         return R.ok().put("member", member);
@@ -49,6 +51,7 @@ public class MemberControllerImpl implements MemberController {
     /**
      * 保存
      */
+    @Override
     public R save(MemberEntity member) {
         memberService.save(member);
         return R.ok();
@@ -57,6 +60,7 @@ public class MemberControllerImpl implements MemberController {
     /**
      * 修改
      */
+    @Override
     public R update(MemberEntity member) {
         memberService.updateById(member);
         return R.ok();
@@ -65,8 +69,19 @@ public class MemberControllerImpl implements MemberController {
     /**
      * 删除
      */
+    @Override
     public R delete(Long[] ids) {
         memberService.removeByIds(Arrays.asList(ids));
+        return R.ok();
+    }
+
+    @Override
+    public R register(String username, String password, String phone) {
+        try {
+            memberService.register(username, password, phone);
+        } catch (Exception e) {
+            R.error(10001, e.getMessage());
+        }
         return R.ok();
     }
 }

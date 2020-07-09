@@ -5,10 +5,7 @@ import io.github.thesixonenine.member.entity.MemberEntity;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.cloud.openfeign.FeignClient;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.Map;
 
@@ -53,4 +50,13 @@ public interface MemberController {
     @RequestMapping("/member/member/delete")
     R delete(@RequestBody Long[] ids);
 
+    /**
+     * 用户注册
+     *
+     * @return 通用返回
+     */
+    @GetMapping(value = "/member/member/register")
+    R register(@RequestParam("username") String username,
+               @RequestParam("password") String password,
+               @RequestParam("phone") String phone);
 }
