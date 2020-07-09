@@ -44,7 +44,10 @@ spring:
         uri: lb://search
         predicates:
           - Host=search.jdmall.com
-
+      - id: jdmall_auth_route
+        uri: lb://auth
+        predicates:
+          - Host=auth.jdmall.com
 management:
   endpoints:
     web:
