@@ -3,6 +3,9 @@ server:
   undertow:
     io-threads: 2
     worker-threads: 16
+  servlet:
+    session:
+      timeout: 10m
 feign:
   httpclient:
     enabled: false
@@ -46,5 +49,8 @@ spring:
     port: 6379
   thymeleaf:
     cache: false
+  session:
+    store-type: redis
+
 auth:
   sms-code: 123456

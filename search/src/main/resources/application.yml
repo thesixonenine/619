@@ -4,7 +4,7 @@ spring:
   thymeleaf:
     cache: false
 server:
-  port: 20000
+  port: 12000
   undertow:
     io-threads: 2
     worker-threads: 16

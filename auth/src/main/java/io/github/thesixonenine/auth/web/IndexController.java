@@ -5,6 +5,7 @@ import io.github.thesixonenine.auth.vo.UserLoginVO;
 import io.github.thesixonenine.auth.vo.UserRegisterVO;
 import io.github.thesixonenine.common.utils.R;
 import io.github.thesixonenine.member.controller.MemberController;
+import io.github.thesixonenine.member.entity.MemberEntity;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -18,8 +19,10 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import javax.servlet.http.HttpSession;
 import javax.validation.Valid;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
@@ -116,7 +119,7 @@ public class IndexController {
     }
 
     @PostMapping(value = "/signin")
-    public String login(@Valid UserLoginVO userLoginVO, RedirectAttributes redirectAttributes) {
+    public String login(@Valid UserLoginVO userLoginVO, RedirectAttributes redirectAttributes, HttpSession session) {
         // 远程登录
         R r = memberController.login(userLoginVO.getUsername(), userLoginVO.getPassword());
         if (r.getCode() != 0) {
@@ -125,6 +128,18 @@ public class IndexController {
             redirectAttributes.addFlashAttribute("errors", map);
             return "redirect:http://auth.jdmall.com/login";
         }
+        LinkedHashMap<String, Object> data = (LinkedHashMap<String, Object>)r.get("data");
+        MemberEntity member = new MemberEntity();
+        Integer id = (Integer) data.get("id");
+        Integer levelId = (Integer) data.get("levelId");
+        String username = (String) data.get("username");
+        String mobile = (String) data.get("mobile");
+
+        member.setId(Long.valueOf(id));
+        member.setLevelId(Long.valueOf(levelId));
+        member.setUsername(username);
+        member.setMobile(mobile);
+        session.setAttribute("loginUser", member);
         return "redirect:http://jdmall.com";
     }
 }

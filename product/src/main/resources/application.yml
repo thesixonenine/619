@@ -19,6 +19,8 @@ spring:
       # 缓存空值 防止缓存击穿
       cache-null-values: true
     type: redis
+  session:
+    store-type: redis
 mybatis-plus:
   # 默认值
   mapper-locations: classpath:/mapper/**/*.xml
