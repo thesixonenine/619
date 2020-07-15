@@ -3,6 +3,10 @@ spring:
     allow-bean-definition-overriding: true
   thymeleaf:
     cache: false
+  redis:
+    host: 192.168.137.10
+  session:
+    store-type: redis
 server:
   port: 12000
   undertow:

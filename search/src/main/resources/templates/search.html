@@ -64,10 +64,12 @@
         </b>
         <ul>
             <li>
-                <a href="#" class="li_2">你好，请登录</a>
+<!--                <a href="#" class="li_2">你好，请登录</a>-->
+                <a class="li_2" th:if="${session.loginUser != null}">欢迎: [[${session.loginUser == null?'':session.loginUser.username}]]</a>
+                <a class="li_2" href="http://auth.jdmall.com/login" th:if="${session.loginUser == null}">你好, 请登录</a>
             </li>
             <li>
-                <a href="#">免费注册</a>
+                <a href="http://auth.jdmall.com/login" th:if="${session.loginUser == null}">免费注册</a>
             </li>
             <span>|</span>
             <li>

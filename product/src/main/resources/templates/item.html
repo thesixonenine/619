@@ -13,7 +13,7 @@
 		<header>
 					<div class="min">
 						<ul class="header_ul_left">
-							<li class="glyphicon glyphicon-home"> <a href="shouye.html" class="aa">首页</a></li>
+							<li class="glyphicon glyphicon-home"> <a href="http://jdmall.com" class="aa">首页</a></li>
 							<li class="glyphicon glyphicon-map-marker"> <a href="javascript:;">北京</a>
 								<ol id="beijing">
 									<li style="background: red;"><a href="javascript:;" style="color: white;">北京</a></li>
@@ -55,17 +55,19 @@
 							</li>
 						</ul>
 						<ul class="header_ul_right">
-							<li style="border: 0;"><a href="../登录页面\index.html" class="aa">你好，请登录</a></li>
-							<li><a href="../注册页面\index.html" style="color: red;">免费注册</a> |</li>
+							<li style="border: 0;">
+								<a href="http://auth.jdmall.com/login" th:if="${session.loginUser == null}" class="aa">你好，请登录 |</a>
+								<a th:if="${session.loginUser != null}">欢迎: [[${session.loginUser == null?'':session.loginUser.username}]] |</a>
+							</li>
+							<li th:if="${session.loginUser == null}"><a href="http://auth.jdmall.com/login" style="color: red;">免费注册</a> |</li>
 							<li><a href="javascript:;" class="aa">我的订单</a> |</li>
- 
 						</ul>
 					</div>
 				</header>
 				<nav>
 				<div class="nav_min">
 					<div class="nav_top">
-						<div class="nav_top_one"><a href="#"><img src="/img/logo1.jpg"/></a></div>
+						<div class="nav_top_one"><a href="http://jdmall.com"><img src="/img/logo1.jpg"/></a></div>
 						<div class="nav_top_two"><input type="text"/><button>搜索</button></div>
 						<div class="nav_top_three"><a href="../JD_Shop/One_JDshop.html">我的购物车</a><span class="glyphicon glyphicon-shopping-cart"></span>
 							<div class="nav_top_three_1">
