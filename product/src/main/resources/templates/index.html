@@ -96,7 +96,8 @@
   					</b>
         <ul>
           <li>
-            <a href="http://auth.jdmall.com/login">你好，请登录: [[${session.loginUser == null?'':session.loginUser.username}]]</a>
+            <a th:if="${session.loginUser != null}">欢迎: [[${session.loginUser == null?'':session.loginUser.username}]]</a>
+            <a href="http://auth.jdmall.com/login" th:if="${session.loginUser == null}">你好, 请登录</a>
           </li>
           <li>
             <a href="http://auth.jdmall.com/reg" class="li_2">免费注册</a>
