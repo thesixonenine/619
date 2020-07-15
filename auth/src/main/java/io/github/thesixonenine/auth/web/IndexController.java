@@ -24,6 +24,7 @@ import javax.validation.Valid;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.Objects;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
@@ -38,6 +39,7 @@ public class IndexController {
     private static final String SMS_CODE_REDIS_PREFIX = "sms:code:";
     private static final String SMS_CODE_REDIS_VALUE_SPLIT = "_";
     private static final Long SMS_CODE_REDIS_CACHE_TIME = 10L;
+    public static final String LOGIN_USER = "loginUser";
     @Autowired
     private StringRedisTemplate redisTemplate;
     @Autowired
@@ -128,7 +130,7 @@ public class IndexController {
             redirectAttributes.addFlashAttribute("errors", map);
             return "redirect:http://auth.jdmall.com/login";
         }
-        LinkedHashMap<String, Object> data = (LinkedHashMap<String, Object>)r.get("data");
+        LinkedHashMap<String, Object> data = (LinkedHashMap<String, Object>) r.get("data");
         MemberEntity member = new MemberEntity();
         Integer id = (Integer) data.get("id");
         Integer levelId = (Integer) data.get("levelId");
@@ -139,7 +141,18 @@ public class IndexController {
         member.setLevelId(Long.valueOf(levelId));
         member.setUsername(username);
         member.setMobile(mobile);
-        session.setAttribute("loginUser", member);
+        session.setAttribute(LOGIN_USER, member);
+        return "redirect:http://jdmall.com";
+    }
+
+    @GetMapping(value = "/login")
+    public String loginPage(HttpSession session) {
+        // 如果已登录, 则直接去首页
+        Object o = session.getAttribute(LOGIN_USER);
+        if (Objects.isNull(o)) {
+            // 没登录, 去登录
+            return "login";
+        }
         return "redirect:http://jdmall.com";
     }
 }
