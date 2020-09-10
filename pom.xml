@@ -17,6 +17,7 @@
 
     <modules>
         <module>admin</module>
+        <module>auth</module>
         <module>common</module>
         <module>coupon</module>
         <module>coupon-common</module>
@@ -32,6 +33,8 @@
         <module>search-common</module>
         <module>ware</module>
         <module>ware-common</module>
+        <module>cart</module>
+        <module>cart-common</module>
     </modules>
 
 </project>

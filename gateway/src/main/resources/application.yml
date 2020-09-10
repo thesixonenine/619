@@ -48,6 +48,10 @@ spring:
         uri: lb://auth
         predicates:
           - Host=auth.jdmall.com
+      - id: jdmall_cart_route
+        uri: lb://cart
+        predicates:
+          - Host=cart.jdmall.com
 management:
   endpoints:
     web:
