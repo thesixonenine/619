@@ -3,6 +3,7 @@ package io.github.thesixonenine.auth.web;
 import com.google.gson.reflect.TypeToken;
 import io.github.thesixonenine.auth.vo.UserLoginVO;
 import io.github.thesixonenine.auth.vo.UserRegisterVO;
+import io.github.thesixonenine.common.utils.Constant;
 import io.github.thesixonenine.common.utils.R;
 import io.github.thesixonenine.member.controller.MemberController;
 import io.github.thesixonenine.member.entity.MemberEntity;
@@ -39,7 +40,7 @@ public class IndexController {
     private static final String SMS_CODE_REDIS_PREFIX = "sms:code:";
     private static final String SMS_CODE_REDIS_VALUE_SPLIT = "_";
     private static final Long SMS_CODE_REDIS_CACHE_TIME = 10L;
-    public static final String LOGIN_USER = "loginUser";
+
     @Autowired
     private StringRedisTemplate redisTemplate;
     @Autowired
@@ -141,14 +142,14 @@ public class IndexController {
         member.setLevelId(Long.valueOf(levelId));
         member.setUsername(username);
         member.setMobile(mobile);
-        session.setAttribute(LOGIN_USER, member);
+        session.setAttribute(Constant.LOGIN_USER, member);
         return "redirect:http://jdmall.com";
     }
 
     @GetMapping(value = "/login")
     public String loginPage(HttpSession session) {
         // 如果已登录, 则直接去首页
-        Object o = session.getAttribute(LOGIN_USER);
+        Object o = session.getAttribute(Constant.LOGIN_USER);
         if (Objects.isNull(o)) {
             // 没登录, 去登录
             return "login";
