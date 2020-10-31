@@ -29,4 +29,13 @@ public class IndexController {
         Pair<Long, String> pair = CartInterceptor.threadLocal.get();
         return "cartList";
     }
+
+    /**
+     * 添加商品到购物车
+     * @return 添加成功页面
+     */
+    @GetMapping(value = "addToCart")
+    public String addToCart() {
+        return "success";
+    }
 }
