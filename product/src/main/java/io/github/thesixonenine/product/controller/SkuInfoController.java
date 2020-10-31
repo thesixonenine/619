@@ -18,15 +18,14 @@ import java.util.Map;
  * @date 2020-06-06 00:59:35
  */
 @RestController
-@RequestMapping("product/skuinfo")
-public class SkuInfoController {
+public class SkuInfoController implements ISkuInfoController{
     @Autowired
     private SkuInfoService skuInfoService;
 
     /**
      * 列表
      */
-    @GetMapping("/list")
+    @Override
     public R list(@RequestParam Map<String, Object> params) {
         PageUtils page = skuInfoService.queryPage(params);
         return R.ok().put("page", page);
@@ -35,7 +34,7 @@ public class SkuInfoController {
     /**
      * 信息
      */
-    @GetMapping("/info/{skuId}")
+    @Override
     public R info(@PathVariable("skuId") Long skuId) {
         SkuInfoEntity skuInfo = skuInfoService.getById(skuId);
         return R.ok().put("skuInfo", skuInfo);
@@ -44,7 +43,7 @@ public class SkuInfoController {
     /**
      * 保存
      */
-    @PostMapping("/save")
+    @Override
     public R save(@RequestBody SkuInfoEntity skuInfo) {
         skuInfoService.save(skuInfo);
         return R.ok();
@@ -53,7 +52,7 @@ public class SkuInfoController {
     /**
      * 修改
      */
-    @PostMapping("/update")
+    @Override
     public R update(@RequestBody SkuInfoEntity skuInfo) {
         skuInfoService.updateById(skuInfo);
         return R.ok();
@@ -62,7 +61,7 @@ public class SkuInfoController {
     /**
      * 删除
      */
-    @PostMapping("/delete")
+    @Override
     public R delete(@RequestBody Long[] skuIds) {
         skuInfoService.removeByIds(Arrays.asList(skuIds));
         return R.ok();

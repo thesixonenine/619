@@ -1,13 +1,14 @@
 package io.github.thesixonenine.cart.web;
 
 import io.github.thesixonenine.cart.interceptor.CartInterceptor;
-import io.github.thesixonenine.common.utils.Constant;
+import io.github.thesixonenine.cart.service.ICartService;
+import io.github.thesixonenine.cart.vo.CartItem;
 import org.apache.commons.lang3.tuple.Pair;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
-
-import javax.servlet.http.HttpSession;
-import java.util.Objects;
+import org.springframework.web.bind.annotation.RequestParam;
 
 /**
  * @author Simple
@@ -17,6 +18,8 @@ import java.util.Objects;
  */
 @Controller
 public class IndexController {
+    @Autowired
+    private ICartService cartService;
 
     /**
      * cookie中保存user-key来标识用户身份, 一个月过期
@@ -32,10 +35,15 @@ public class IndexController {
 
     /**
      * 添加商品到购物车
+     *
      * @return 添加成功页面
      */
     @GetMapping(value = "addToCart")
-    public String addToCart() {
+    public String addToCart(@RequestParam(value = "skuId") Long skuId,
+                            @RequestParam(value = "num") Integer num,
+                            Model model) {
+        CartItem cartItem = cartService.addToCart(skuId, num);
+        model.addAttribute("item", cartItem);
         return "success";
     }
 }

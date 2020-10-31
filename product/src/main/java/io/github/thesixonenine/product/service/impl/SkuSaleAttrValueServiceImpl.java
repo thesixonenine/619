@@ -2,6 +2,8 @@ package io.github.thesixonenine.product.service.impl;
 
 import org.springframework.stereotype.Service;
 import java.util.Map;
+import java.util.Objects;
+
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
@@ -18,9 +20,11 @@ public class SkuSaleAttrValueServiceImpl extends ServiceImpl<SkuSaleAttrValueDao
 
     @Override
     public PageUtils queryPage(Map<String, Object> params) {
+        QueryWrapper<SkuSaleAttrValueEntity> queryWrapper = new QueryWrapper<>();
+        queryWrapper.eq(Objects.nonNull(params.get("skuId")), "skuId", params.get("skuId"));
         IPage<SkuSaleAttrValueEntity> page = this.page(
                 new Query<SkuSaleAttrValueEntity>().getPage(params),
-                new QueryWrapper<SkuSaleAttrValueEntity>()
+                queryWrapper
         );
 
         return new PageUtils(page);

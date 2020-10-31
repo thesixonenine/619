@@ -4,6 +4,8 @@ server:
     io-threads: 2
     worker-threads: 16
 spring:
+  main:
+    allow-bean-definition-overriding: true
   redis:
     host: 192.168.137.10
 management:
@@ -23,3 +25,8 @@ logging:
           client:
             config:
               impl: warn
+
+thread:
+  core-pool-size: 20
+  maximum-pool-size: 50
+  keep-alive-time: 10

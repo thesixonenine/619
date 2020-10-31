@@ -253,8 +253,8 @@
 						<div class="box-btns clear">
 							<div class="box-btns-one">
 								<form id="itemForm" action="http://cart.jdmall.com/addToCart" method="get">
+									<input type="hidden" name="skuId"  th:value="${result.skuInfoEntity.skuId}" />
 									<input type="text" name="num" id=""  value="1"/>
-									<input type="hidden" name="skuId"  th:value="${skuInfo?.id}" />
 
 									<div class="box-btns-one1">
 

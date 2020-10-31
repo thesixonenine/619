@@ -1,5 +1,7 @@
 package io.github.thesixonenine.cart.service;
 
+import io.github.thesixonenine.cart.vo.CartItem;
+
 /**
  * @author Simple
  * @version 1.0
@@ -7,4 +9,12 @@ package io.github.thesixonenine.cart.service;
  * @since 1.0
  */
 public interface ICartService {
+    /**
+     * 添加到购物车
+     *
+     * @param skuId
+     * @param num
+     * @return
+     */
+    CartItem addToCart(Long skuId, Integer num);
 }

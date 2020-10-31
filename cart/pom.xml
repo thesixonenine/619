@@ -31,6 +31,19 @@
             <groupId>io.github.thesixonenine</groupId>
             <artifactId>member-common</artifactId>
             <version>0.0.1-SNAPSHOT</version>
+            <scope>compile</scope>
+            <exclusions>
+                <exclusion>
+                    <groupId>io.github.thesixonenine</groupId>
+                    <artifactId>common</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+        <dependency>
+            <groupId>io.github.thesixonenine</groupId>
+            <artifactId>product-common</artifactId>
+            <version>0.0.1-SNAPSHOT</version>
+            <scope>compile</scope>
             <exclusions>
                 <exclusion>
                     <groupId>io.github.thesixonenine</groupId>
@@ -83,10 +96,6 @@
         <!--            <version>3.12.0</version>-->
         <!--        </dependency>-->
 
-        <dependency>
-            <groupId>org.springframework.session</groupId>
-            <artifactId>spring-session-data-redis</artifactId>
-        </dependency>
 
         <dependency>
             <groupId>org.projectlombok</groupId>
