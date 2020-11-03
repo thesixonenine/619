@@ -4,13 +4,14 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.github.thesixonenine.cart.interceptor.CartInterceptor;
 import io.github.thesixonenine.cart.service.ICartService;
+import io.github.thesixonenine.cart.vo.Cart;
 import io.github.thesixonenine.cart.vo.CartItem;
 import io.github.thesixonenine.common.utils.Constant;
 import io.github.thesixonenine.common.utils.R;
 import io.github.thesixonenine.product.controller.ISkuInfoController;
 import io.github.thesixonenine.product.controller.ISkuSaleAttrValueController;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.tuple.Pair;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.BoundHashOperations;
@@ -22,6 +23,7 @@ import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ThreadPoolExecutor;
+import java.util.stream.Collectors;
 
 /**
  * @author Simple
@@ -105,6 +107,30 @@ public class CartServiceImpl implements ICartService {
         return getCartItem(o);
     }
 
+    @Override
+    public Cart getCart() {
+        List<CartItem> tempCartItemList = getTempCartItemList();
+        Pair<Long, String> pair = getUserKey();
+        Cart cart = new Cart();
+        if (pair.getLeft() != null) {
+            // 已登录
+            log.debug("用户已登录");
+            if (CollectionUtils.isNotEmpty(tempCartItemList)) {
+                // 添加到购物车中
+                for (CartItem cartItem : tempCartItemList) {
+                    addToCart(cartItem.getSkuId(), cartItem.getCount());
+                }
+                // 清空临时购物车
+                clearCartItemList(CART_PREFIX + pair.getRight());
+            }
+            List<CartItem> cartItemList = getCartItemList();
+            cart.setItemList(cartItemList);
+        } else {
+            cart.setItemList(tempCartItemList);
+        }
+        return cart;
+    }
+
     private CartItem getCartItem(String o) {
         ObjectMapper objectMapper = new ObjectMapper();
         CartItem item;
@@ -130,17 +156,54 @@ public class CartServiceImpl implements ICartService {
     }
 
     private BoundHashOperations<String, Object, Object> getCartOps() {
-        Pair<Long, String> pair = CartInterceptor.threadLocal.get();
-        String cartKey = StringUtils.EMPTY;
+        Pair<Long, String> pair = getUserKey();
+        String cartKey;
         if (pair.getLeft() != null) {
             // 已登录
-            log.debug("用户已登录");
             cartKey = CART_PREFIX + pair.getLeft();
         } else {
-            log.debug("用户未登录");
             cartKey = CART_PREFIX + pair.getRight();
         }
         // 绑定hash操作
         return redisTemplate.boundHashOps(cartKey);
+    }
+
+    private Pair<Long, String> getUserKey() {
+        Pair<Long, String> pair = CartInterceptor.threadLocal.get();
+        if (pair.getLeft() != null) {
+            // 已登录
+            log.debug("用户已登录");
+        } else {
+            log.debug("用户未登录");
+        }
+        return pair;
+    }
+
+    private List<CartItem> getCartItemList() {
+        Pair<Long, String> pair = CartInterceptor.threadLocal.get();
+        String key = CART_PREFIX + pair.getLeft();
+        return getCartItemList(key);
+    }
+
+    private List<CartItem> getTempCartItemList() {
+        Pair<Long, String> pair = CartInterceptor.threadLocal.get();
+        String key = CART_PREFIX + pair.getRight();
+        return getCartItemList(key);
+    }
+
+    private List<CartItem> getCartItemList(String key) {
+        List<Object> values = redisTemplate.boundHashOps(key).values();
+        if (CollectionUtils.isNotEmpty(values)) {
+            return values.stream().map(t -> {
+                String s = (String) t;
+                return getCartItem(s);
+            }).collect(Collectors.toList());
+        }
+
+        return Collections.emptyList();
+    }
+
+    private void clearCartItemList(String key) {
+        redisTemplate.delete(key);
     }
 }

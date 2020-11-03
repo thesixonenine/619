@@ -1,5 +1,6 @@
 package io.github.thesixonenine.cart.service;
 
+import io.github.thesixonenine.cart.vo.Cart;
 import io.github.thesixonenine.cart.vo.CartItem;
 
 /**
@@ -25,4 +26,12 @@ public interface ICartService {
      * @return
      */
     CartItem getCartItemBySkuId(Long skuId);
+
+    /**
+     * 获取整个购物车
+     *
+     * @return
+     */
+    Cart getCart();
+
 }

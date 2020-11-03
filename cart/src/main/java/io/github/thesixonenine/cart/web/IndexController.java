@@ -2,6 +2,7 @@ package io.github.thesixonenine.cart.web;
 
 import io.github.thesixonenine.cart.interceptor.CartInterceptor;
 import io.github.thesixonenine.cart.service.ICartService;
+import io.github.thesixonenine.cart.vo.Cart;
 import io.github.thesixonenine.cart.vo.CartItem;
 import org.apache.commons.lang3.tuple.Pair;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,8 +30,10 @@ public class IndexController {
      * @return page
      */
     @GetMapping(value = "cart.html")
-    public String cartListPage() {
+    public String cartListPage(Model model) {
         Pair<Long, String> pair = CartInterceptor.threadLocal.get();
+        Cart cart = cartService.getCart();
+        model.addAttribute("cart", cart);
         return "cartList";
     }
 
