@@ -47,44 +47,66 @@ public class CartServiceImpl implements ICartService {
     @Override
     public CartItem addToCart(Long skuId, Integer num) {
         BoundHashOperations<String, Object, Object> cartOps = getCartOps();
-        CartItem item = new CartItem();
-        CompletableFuture<Void> getSkuInfoTsk = CompletableFuture.runAsync(() -> {
-            // 查询商品信息
-            R r = skuInfoController.info(skuId);
-            LinkedHashMap<String, Object> skuInfo = (LinkedHashMap<String, Object>) r.get("skuInfo");
 
-            item.setCheck(true);
-            item.setCount(num);
-            item.setImage((String) skuInfo.get("skuDefaultImg"));
-            item.setTitle((String) skuInfo.get("skuTitle"));
-            item.setSkuId(skuId);
-            item.setPrice(new BigDecimal(String.valueOf((Double) skuInfo.get("price"))));
-        }, threadPoolExecutor);
-
-        CompletableFuture<Void> getSkuSaleAttrValues = CompletableFuture.runAsync(() -> {
-            Map<String, Object> map = new HashMap<>();
-            map.put(Constant.LIMIT, Integer.MAX_VALUE);
-            map.put("sku_id", skuId);
-            R r = skuSaleAttrValueController.list(map);
-            LinkedHashMap<String, Object> page = (LinkedHashMap<String, Object>) r.get("page");
-            ArrayList<LinkedHashMap<String, Object>> list = (ArrayList<LinkedHashMap<String, Object>>) page.get("list");
-            List<String> skuAttr = new ArrayList<>();
-            for (LinkedHashMap<String, Object> o : list) {
-                skuAttr.add(o.get("attrName") + ": " + o.get("attrValue"));
+        // 添加新商品
+        Object redisProduct = cartOps.get(skuId.toString());
+        if (Objects.nonNull(redisProduct)) {
+            //购物车有此商品, 只需要改数量
+            String o = (String) redisProduct;
+            ObjectMapper objectMapper = new ObjectMapper();
+            CartItem item;
+            try {
+                item = objectMapper.readValue(o, CartItem.class);
+            } catch (JsonProcessingException e) {
+                log.error("skuId[{}]读取redis数据失败", skuId, e);
+                throw new RuntimeException("查询redis商品数据异常");
             }
-            // List<SkuSaleAttrValueEntity> list = (List<SkuSaleAttrValueEntity>) pageUtils.getList();
-            // 查询sku的组合信息
-            item.setSkuAttr(skuAttr);
-        }, threadPoolExecutor);
+            item.setCount(item.getCount() + num);
+            return putCartItemIntoRedis(skuId, cartOps, objectMapper, item);
+        } else {
+            CartItem item = new CartItem();
+            //购物车无此商品
+            CompletableFuture<Void> getSkuInfoTsk = CompletableFuture.runAsync(() -> {
+                // 查询商品信息
+                R r = skuInfoController.info(skuId);
+                LinkedHashMap<String, Object> skuInfo = (LinkedHashMap<String, Object>) r.get("skuInfo");
 
-        try {
-            CompletableFuture.allOf(getSkuInfoTsk, getSkuSaleAttrValues).get();
-        } catch (InterruptedException | ExecutionException e) {
-            log.error("请求远程服务异常", e);
-            throw new RuntimeException("请求远程服务异常");
+                item.setCheck(true);
+                item.setCount(num);
+                item.setImage((String) skuInfo.get("skuDefaultImg"));
+                item.setTitle((String) skuInfo.get("skuTitle"));
+                item.setSkuId(skuId);
+                item.setPrice(new BigDecimal(String.valueOf(skuInfo.get("price"))));
+            }, threadPoolExecutor);
+
+            CompletableFuture<Void> getSkuSaleAttrValues = CompletableFuture.runAsync(() -> {
+                Map<String, Object> map = new HashMap<>();
+                map.put(Constant.LIMIT, Integer.MAX_VALUE);
+                map.put("sku_id", skuId);
+                R r = skuSaleAttrValueController.list(map);
+                LinkedHashMap<String, Object> page = (LinkedHashMap<String, Object>) r.get("page");
+                ArrayList<LinkedHashMap<String, Object>> list = (ArrayList<LinkedHashMap<String, Object>>) page.get("list");
+                List<String> skuAttr = new ArrayList<>();
+                for (LinkedHashMap<String, Object> o : list) {
+                    skuAttr.add(o.get("attrName") + ": " + o.get("attrValue"));
+                }
+                // 查询sku的组合信息
+                item.setSkuAttr(skuAttr);
+            }, threadPoolExecutor);
+
+            try {
+                CompletableFuture.allOf(getSkuInfoTsk, getSkuSaleAttrValues).get();
+            } catch (InterruptedException | ExecutionException e) {
+                log.error("请求远程服务异常", e);
+                throw new RuntimeException("请求远程服务异常");
+            }
+
+            ObjectMapper objectMapper = new ObjectMapper();
+            return putCartItemIntoRedis(skuId, cartOps, objectMapper, item);
         }
+    }
 
-        ObjectMapper objectMapper = new ObjectMapper();
+    private CartItem putCartItemIntoRedis(Long skuId, BoundHashOperations<String, Object, Object> cartOps, ObjectMapper objectMapper, CartItem item) {
         String value;
         try {
             value = objectMapper.writeValueAsString(item);
