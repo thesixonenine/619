@@ -9,6 +9,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 /**
  * @author Simple
@@ -41,8 +42,16 @@ public class IndexController {
     @GetMapping(value = "addToCart")
     public String addToCart(@RequestParam(value = "skuId") Long skuId,
                             @RequestParam(value = "num") Integer num,
-                            Model model) {
-        CartItem cartItem = cartService.addToCart(skuId, num);
+                            RedirectAttributes redirectAttributes) {
+        cartService.addToCart(skuId, num);
+        redirectAttributes.addAttribute("skuId", skuId);
+        return "redirect:http://cart.jdmall.com/addToCartSuccess.html";
+    }
+
+    @GetMapping(value = "addToCartSuccess.html")
+    public String addToCartSuccessPage(@RequestParam(value = "skuId") Long skuId,
+                                       Model model) {
+        CartItem cartItem = cartService.getCartItemBySkuId(skuId);
         model.addAttribute("item", cartItem);
         return "success";
     }

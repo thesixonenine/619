@@ -53,16 +53,9 @@ public class CartServiceImpl implements ICartService {
         if (Objects.nonNull(redisProduct)) {
             //购物车有此商品, 只需要改数量
             String o = (String) redisProduct;
-            ObjectMapper objectMapper = new ObjectMapper();
-            CartItem item;
-            try {
-                item = objectMapper.readValue(o, CartItem.class);
-            } catch (JsonProcessingException e) {
-                log.error("skuId[{}]读取redis数据失败", skuId, e);
-                throw new RuntimeException("查询redis商品数据异常");
-            }
+            CartItem item = getCartItem(o);
             item.setCount(item.getCount() + num);
-            return putCartItemIntoRedis(skuId, cartOps, objectMapper, item);
+            return putCartItemIntoRedis(skuId, cartOps, item);
         } else {
             CartItem item = new CartItem();
             //购物车无此商品
@@ -101,15 +94,33 @@ public class CartServiceImpl implements ICartService {
                 throw new RuntimeException("请求远程服务异常");
             }
 
-            ObjectMapper objectMapper = new ObjectMapper();
-            return putCartItemIntoRedis(skuId, cartOps, objectMapper, item);
+            return putCartItemIntoRedis(skuId, cartOps, item);
         }
     }
 
-    private CartItem putCartItemIntoRedis(Long skuId, BoundHashOperations<String, Object, Object> cartOps, ObjectMapper objectMapper, CartItem item) {
+    @Override
+    public CartItem getCartItemBySkuId(Long skuId) {
+        BoundHashOperations<String, Object, Object> cartOps = getCartOps();
+        String o = (String) cartOps.get(skuId.toString());
+        return getCartItem(o);
+    }
+
+    private CartItem getCartItem(String o) {
+        ObjectMapper objectMapper = new ObjectMapper();
+        CartItem item;
+        try {
+            item = objectMapper.readValue(o, CartItem.class);
+        } catch (JsonProcessingException e) {
+            log.error("[{}]读取redis数据失败", o, e);
+            throw new RuntimeException("查询redis商品数据异常");
+        }
+        return item;
+    }
+
+    private CartItem putCartItemIntoRedis(Long skuId, BoundHashOperations<String, Object, Object> cartOps, CartItem item) {
         String value;
         try {
-            value = objectMapper.writeValueAsString(item);
+            value = new ObjectMapper().writeValueAsString(item);
         } catch (JsonProcessingException e) {
             log.error("序列化skuId[{}]错误", skuId, e);
             throw new RuntimeException("序列化商品错误");
