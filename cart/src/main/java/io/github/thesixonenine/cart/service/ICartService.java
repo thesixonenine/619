@@ -36,6 +36,7 @@ public interface ICartService {
 
     /**
      * 选中或取消选中购物项
+     *
      * @param skuId
      * @param b 是否选中
      */
@@ -43,8 +44,16 @@ public interface ICartService {
 
     /**
      * 改变购物项的数量
+     *
      * @param skuId
      * @param num
      */
     void changeItemNum(Long skuId, Integer num);
+
+    /**
+     * 删除购物项
+     *
+     * @param skuId
+     */
+    void delItem(Long skuId);
 }

@@ -23,6 +23,12 @@ public class IndexController {
     @Autowired
     private ICartService cartService;
 
+    @GetMapping(value = "delItem")
+    public String delItem(@RequestParam(value = "skuId") Long skuId) {
+        cartService.delItem(skuId);
+        return "redirect:http://cart.jdmall.com/cart.html";
+    }
+
     @GetMapping(value = "countItem")
     public String countItem(@RequestParam(value = "skuId") Long skuId,
                             @RequestParam(value = "num") Integer num) {

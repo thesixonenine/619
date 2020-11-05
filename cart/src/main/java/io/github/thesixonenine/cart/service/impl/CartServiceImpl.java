@@ -145,6 +145,12 @@ public class CartServiceImpl implements ICartService {
         putCartItemIntoRedis(skuId, getCartOps(), cartItem);
     }
 
+    @Override
+    public void delItem(Long skuId) {
+        BoundHashOperations<String, Object, Object> cartOps = getCartOps();
+        cartOps.delete(skuId.toString());
+    }
+
     private CartItem getCartItem(String o) {
         ObjectMapper objectMapper = new ObjectMapper();
         CartItem item;

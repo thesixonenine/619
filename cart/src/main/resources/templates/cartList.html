@@ -156,7 +156,7 @@
                             </li>
                             <li style="font-weight:bold"><p class="zj">￥[[${#numbers.formatDecimal(item.totalPrice, 1, 2)}]]</p></li>
                             <li>
-                                <p>删除</p>
+                                <p class="delItemBtn" th:attr="skuId=${item.skuId}">删除</p>
 
                             </li>
                         </ol>
@@ -207,7 +207,7 @@
 				</dl>
 			</div>
 			<div>
-				<button type="button">删除</button>
+				<button onclick="delItem()" type="button">删除</button>
 
 			</div>
 		</div>
@@ -818,5 +818,12 @@
 			var num = $(this).parent().find(".countOpsNum").text();
 			location.href = "http://cart.jdmall.com/countItem?skuId=" + skuId + "&num=" + num;
 		});
+		var delSkuId = 0;
+		$(".delItemBtn").click(function () {
+			delSkuId = $(this).attr("skuId");
+		});
+		function delItem() {
+			location.href = "http://cart.jdmall.com/delItem?skuId=" + delSkuId;
+		}
 	</script>
 </html>
