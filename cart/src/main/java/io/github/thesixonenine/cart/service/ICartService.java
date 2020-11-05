@@ -34,4 +34,10 @@ public interface ICartService {
      */
     Cart getCart();
 
+    /**
+     * 选中或取消选中购物项
+     * @param skuId
+     * @param b 是否选中
+     */
+    void checkItem(Long skuId, boolean b);
 }

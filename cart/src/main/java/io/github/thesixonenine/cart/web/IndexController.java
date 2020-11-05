@@ -23,6 +23,13 @@ public class IndexController {
     @Autowired
     private ICartService cartService;
 
+    @GetMapping(value = "checkItem")
+    public String checkItem(@RequestParam(value = "skuId") Long skuId,
+                            @RequestParam(value = "check") Integer check) {
+        cartService.checkItem(skuId, check!=0);
+        return "redirect:http://cart.jdmall.com/cart.html";
+    }
+
     /**
      * cookie中保存user-key来标识用户身份, 一个月过期
      * 第一次也会给一个user-key
