@@ -138,6 +138,13 @@ public class CartServiceImpl implements ICartService {
         putCartItemIntoRedis(skuId, getCartOps(), cartItem);
     }
 
+    @Override
+    public void changeItemNum(Long skuId, Integer num) {
+        CartItem cartItem = getCartItemBySkuId(skuId);
+        cartItem.setCount(num);
+        putCartItemIntoRedis(skuId, getCartOps(), cartItem);
+    }
+
     private CartItem getCartItem(String o) {
         ObjectMapper objectMapper = new ObjectMapper();
         CartItem item;

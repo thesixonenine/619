@@ -23,6 +23,13 @@ public class IndexController {
     @Autowired
     private ICartService cartService;
 
+    @GetMapping(value = "countItem")
+    public String countItem(@RequestParam(value = "skuId") Long skuId,
+                            @RequestParam(value = "num") Integer num) {
+        cartService.changeItemNum(skuId, num);
+        return "redirect:http://cart.jdmall.com/cart.html";
+    }
+
     @GetMapping(value = "checkItem")
     public String checkItem(@RequestParam(value = "skuId") Long skuId,
                             @RequestParam(value = "check") Integer check) {

@@ -40,4 +40,11 @@ public interface ICartService {
      * @param b 是否选中
      */
     void checkItem(Long skuId, boolean b);
+
+    /**
+     * 改变购物项的数量
+     * @param skuId
+     * @param num
+     */
+    void changeItemNum(Long skuId, Integer num);
 }
