@@ -2,15 +2,13 @@ package io.github.thesixonenine.order.config;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.amqp.core.Message;
+import org.springframework.amqp.rabbit.connection.ConnectionFactory;
 import org.springframework.amqp.rabbit.connection.CorrelationData;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.amqp.support.converter.Jackson2JsonMessageConverter;
 import org.springframework.amqp.support.converter.MessageConverter;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-
-import javax.annotation.PostConstruct;
 
 /**
  * @author Simple
@@ -22,16 +20,18 @@ import javax.annotation.PostConstruct;
 @Configuration
 public class RabbitConfig {
 
+    // @Autowired
+    // RabbitTemplate rabbitTemplate;
+
     @Bean
     public MessageConverter messageConverter() {
         return new Jackson2JsonMessageConverter();
     }
 
-    @Autowired
-    private RabbitTemplate rabbitTemplate;
-
-    @PostConstruct
-    public void initRabbitTemplate() {
+    // @PostConstruct
+    @Bean
+    public RabbitTemplate initRabbitTemplate(ConnectionFactory connectionFactory) {
+        RabbitTemplate rabbitTemplate = new RabbitTemplate(connectionFactory);
         // 接收端确认: 使用两个CallBack来确认消息是否成功投递到队列
         // 消费端确认: 默认是自动确认的, 但如果消息处理失败(应用被kill), 则消息就丢失了
         //            配置spring.rabbitmq.listener.simple.acknowledge-mode=manual
@@ -67,5 +67,6 @@ public class RabbitConfig {
                 log.error("returnedMessage...FailedMessage[{}], replyCode[{}], replyText[{}], exchange[{}], routingKey[{}]", message, replyCode, replyText, exchange, routingKey);
             }
         });
+        return rabbitTemplate;
     }
 }

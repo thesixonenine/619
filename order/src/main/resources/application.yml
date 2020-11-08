@@ -21,6 +21,8 @@ spring:
       simple:
         # 开启消费端的消息手动回复ack确认消费
         acknowledge-mode: manual
+  thymeleaf:
+    cache: false
 mybatis-plus:
   # 默认值
   mapper-locations: classpath:/mapper/**/*.xml

@@ -52,6 +52,10 @@ spring:
         uri: lb://cart
         predicates:
           - Host=cart.jdmall.com
+      - id: jdmall_order_route
+        uri: lb://order
+        predicates:
+          - Host=order.jdmall.com
 management:
   endpoints:
     web:

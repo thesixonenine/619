@@ -30,6 +30,7 @@ public class OrderApplication {
         SpringApplication.run(OrderApplication.class, args);
     }
 
+
     /**
      * 消息监听
      * 1.同一个消息只有一个客户端收到
@@ -43,6 +44,7 @@ public class OrderApplication {
      * @param orderEntity 发送时的消息体, 自动转换
      * @param channel     当前传输数据的通道
      */
+    /*
     @RabbitListener(queues = {"hello-java-queue"})
     public void rec(Message message, OrderEntity orderEntity, Channel channel) {
         MessageProperties messageProperties = message.getMessageProperties();
@@ -88,4 +90,5 @@ public class OrderApplication {
             System.out.println("RabbitHandler接收到" + orderReturnReasonEntity);
         }
     }
+    */
 }
