@@ -64,12 +64,14 @@ public class OrderApplication {
         } catch (IOException e) {
             // ack失败
         }
+
         try {
             // 拒收消息, 并确定是否重新放入队列, false则直接丢弃, 可批量
             channel.basicNack(deliveryTag, false, true);
         } catch (IOException e) {
             // 拒收失败
         }
+
         try {
             // 同Nack, 但不能批量
             channel.basicReject(deliveryTag, false);
