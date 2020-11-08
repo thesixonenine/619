@@ -5,10 +5,12 @@ import io.github.thesixonenine.order.entity.OrderReturnReasonEntity;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.springframework.amqp.core.*;
+import org.springframework.amqp.rabbit.connection.CorrelationData;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
+import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
 @SpringBootTest
@@ -44,11 +46,12 @@ class OrderApplicationTests {
             if (i / 2 == 0) {
                 OrderEntity order = new OrderEntity();
                 order.setId(i);
-                rabbitTemplate.convertAndSend(exchange, routingKey, order);
+                // CorrelationData 消息的唯一id
+                rabbitTemplate.convertAndSend(exchange, routingKey, order, new CorrelationData(UUID.randomUUID().toString()));
             } else {
                 OrderReturnReasonEntity orderReturnReason = new OrderReturnReasonEntity();
                 orderReturnReason.setId(i);
-                rabbitTemplate.convertAndSend(exchange, routingKey, orderReturnReason);
+                rabbitTemplate.convertAndSend(exchange, routingKey, orderReturnReason, new CorrelationData(UUID.randomUUID().toString()));
             }
         }
     }

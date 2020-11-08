@@ -10,6 +10,13 @@ spring:
     host: 192.168.137.10
     port: 5672
     virtual-host: /
+    # Message达到Broker的确认模式
+    publisher-confirm-type: correlated
+    # Message到达Queue的确认
+    publisher-returns: true
+    template:
+      # Message到达Queue后优先异步回调确认
+      mandatory: true
 mybatis-plus:
   # 默认值
   mapper-locations: classpath:/mapper/**/*.xml
