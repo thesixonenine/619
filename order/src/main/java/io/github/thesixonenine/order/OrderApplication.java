@@ -16,6 +16,8 @@ import org.springframework.cloud.openfeign.EnableFeignClients;
 import org.springframework.stereotype.Component;
 import springfox.documentation.swagger2.annotations.EnableSwagger2;
 
+import java.io.IOException;
+
 @EnableRabbit
 @EnableSwagger2
 @EnableFeignClients(basePackages = {"io.github.thesixonenine"})
@@ -44,8 +46,32 @@ public class OrderApplication {
     @RabbitListener(queues = {"hello-java-queue"})
     public void rec(Message message, OrderEntity orderEntity, Channel channel) {
         MessageProperties messageProperties = message.getMessageProperties();
+        // deliveryTag在channel中是自增的
+        long deliveryTag = messageProperties.getDeliveryTag();
         byte[] body = message.getBody();
         System.out.println("RabbitListener接受到消息: " + orderEntity);
+        // 消费者收到消息后, 默认自动回复ack, 从broker中移除
+        // 设置spring.rabbitmq.listener.simple.acknowledge-mode=manual后, 手动确认消息
+
+        try {
+            // 确认收到消息, 可以从broker中移除
+            // multiple 是否批量ack, 批量ack这个channel中的消息
+            channel.basicAck(deliveryTag, false);
+        } catch (IOException e) {
+            // ack失败
+        }
+        try {
+            // 拒收消息, 并确定是否重新放入队列, false则直接丢弃, 可批量
+            channel.basicNack(deliveryTag, false, true);
+        } catch (IOException e) {
+            // 拒收失败
+        }
+        try {
+            // 同Nack, 但不能批量
+            channel.basicReject(deliveryTag, false);
+        } catch (IOException e) {
+            // 拒收失败
+        }
     }
 
     @RabbitListener(queues = {"hello-java-queue"})

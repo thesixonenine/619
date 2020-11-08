@@ -32,6 +32,11 @@ public class RabbitConfig {
 
     @PostConstruct
     public void initRabbitTemplate() {
+        // 接收端确认: 使用两个CallBack来确认消息是否成功投递到队列
+        // 消费端确认: 默认是自动确认的, 但如果消息处理失败(应用被kill), 则消息就丢失了
+        //            配置spring.rabbitmq.listener.simple.acknowledge-mode=manual
+        //            手动回复ack确认消费
+
         // 设置确认Broker成功接收到(cluster下是所有Broker成功接收到)的回调, 此时Message不一定到达Queue
         rabbitTemplate.setConfirmCallback(new RabbitTemplate.ConfirmCallback() {
 
