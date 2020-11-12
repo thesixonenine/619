@@ -17,4 +17,9 @@ public class PageController {
     public String page(@PathVariable(value = "page") String page) {
         return page;
     }
+
+    @GetMapping(value = "/toTrade")
+    public String toTrade() {
+        return "confirm";
+    }
 }
