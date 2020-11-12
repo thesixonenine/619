@@ -5,6 +5,7 @@ import org.apache.commons.collections4.CollectionUtils;
 
 import java.math.BigDecimal;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 /**
@@ -72,7 +73,7 @@ public class Cart {
     public BigDecimal getAmount() {
         BigDecimal result = BigDecimal.ZERO;
         if (CollectionUtils.isNotEmpty(this.itemList)) {
-            result = result.add(itemList.stream().map(CartItem::getTotalPrice).reduce(BigDecimal.ZERO, BigDecimal::add));
+            result = result.add(itemList.stream().filter(t-> (Objects.nonNull(t.getCheck()) && t.getCheck())).map(CartItem::getTotalPrice).reduce(BigDecimal.ZERO, BigDecimal::add));
         }
         result = result.subtract(getReduce());
         if (result.compareTo(BigDecimal.ZERO) <= 0) {

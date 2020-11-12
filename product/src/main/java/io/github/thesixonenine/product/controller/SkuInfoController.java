@@ -1,13 +1,17 @@
 package io.github.thesixonenine.product.controller;
 
+import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import io.github.thesixonenine.common.utils.PageUtils;
 import io.github.thesixonenine.common.utils.R;
 import io.github.thesixonenine.product.entity.SkuInfoEntity;
 import io.github.thesixonenine.product.service.SkuInfoService;
+import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import java.math.BigDecimal;
 import java.util.Arrays;
+import java.util.List;
 import java.util.Map;
 
 
@@ -66,5 +70,19 @@ public class SkuInfoController implements ISkuInfoController{
         skuInfoService.removeByIds(Arrays.asList(skuIds));
         return R.ok();
     }
+
+    @Override
+    public BigDecimal getPrice(Long skuId) {
+        return skuInfoService.getById(skuId).getPrice();
+    }
+
+    @Override
+    public List<SkuInfoEntity> getPriceBatch(List<Long> skuIdList) {
+        if (CollectionUtils.isEmpty(skuIdList)) {
+            throw new RuntimeException("未传递skuIdList");
+        }
+        return skuInfoService.list(Wrappers.<SkuInfoEntity>lambdaQuery().in(SkuInfoEntity::getSkuId, skuIdList));
+    }
+
 
 }

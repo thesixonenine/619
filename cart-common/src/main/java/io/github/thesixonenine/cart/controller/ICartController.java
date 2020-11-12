@@ -1,7 +1,11 @@
 package io.github.thesixonenine.cart.controller;
 
+import io.github.thesixonenine.cart.vo.CartItem;
 import io.swagger.annotations.Api;
 import org.springframework.cloud.openfeign.FeignClient;
+import org.springframework.web.bind.annotation.GetMapping;
+
+import java.util.List;
 
 /**
  * @author Simple
@@ -12,4 +16,7 @@ import org.springframework.cloud.openfeign.FeignClient;
 @Api(value = "购物车")
 @FeignClient(name = "cart")
 public interface ICartController {
+
+    @GetMapping(value = "getCartItem")
+    List<CartItem> getCurrentCartItem();
 }

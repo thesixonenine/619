@@ -3,6 +3,8 @@ package io.github.thesixonenine.cart.service;
 import io.github.thesixonenine.cart.vo.Cart;
 import io.github.thesixonenine.cart.vo.CartItem;
 
+import java.util.List;
+
 /**
  * @author Simple
  * @version 1.0
@@ -56,4 +58,10 @@ public interface ICartService {
      * @param skuId
      */
     void delItem(Long skuId);
+
+    /**
+     * 获取购物车项(非临时购物车)
+     * @return
+     */
+    List<CartItem> getCartItemList();
 }

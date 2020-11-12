@@ -1,9 +1,12 @@
-package io.github.thesixonenine.member.controller;
+package io.github.thesixonenine.member.controller.impl;
 
 import java.util.Arrays;
+import java.util.List;
 import java.util.Map;
 
 // import org.apache.shiro.authz.annotation.RequiresPermissions;
+import com.baomidou.mybatisplus.core.toolkit.Wrappers;
+import io.github.thesixonenine.member.controller.MemberReceiveAddressController;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -25,60 +28,44 @@ import io.github.thesixonenine.common.utils.R;
  * @date 2020-06-06 01:37:14
  */
 @RestController
-@RequestMapping("member/memberreceiveaddress")
-public class MemberReceiveAddressController {
+public class MemberReceiveAddressControllerImpl implements MemberReceiveAddressController {
     @Autowired
     private MemberReceiveAddressService memberReceiveAddressService;
 
-    /**
-     * 列表
-     */
-    @RequestMapping("/list")
-    // @RequiresPermissions("member:memberreceiveaddress:list")
+    @Override
+    public List<MemberReceiveAddressEntity> getByMemberId(Long memberId) {
+        return memberReceiveAddressService.list(Wrappers.<MemberReceiveAddressEntity>lambdaQuery().eq(MemberReceiveAddressEntity::getMemberId, memberId));
+    }
+
+    @Override
     public R list(@RequestParam Map<String, Object> params){
         PageUtils page = memberReceiveAddressService.queryPage(params);
         return R.ok().put("page", page);
     }
 
-
-    /**
-     * 信息
-     */
-    @RequestMapping("/info/{id}")
-    // @RequiresPermissions("member:memberreceiveaddress:info")
+    @Override
     public R info(@PathVariable("id") Long id){
 		MemberReceiveAddressEntity memberReceiveAddress = memberReceiveAddressService.getById(id);
         return R.ok().put("memberReceiveAddress", memberReceiveAddress);
     }
 
-    /**
-     * 保存
-     */
-    @RequestMapping("/save")
-    // @RequiresPermissions("member:memberreceiveaddress:save")
+    @Override
     public R save(@RequestBody MemberReceiveAddressEntity memberReceiveAddress){
 		memberReceiveAddressService.save(memberReceiveAddress);
         return R.ok();
     }
 
-    /**
-     * 修改
-     */
-    @RequestMapping("/update")
-    // @RequiresPermissions("member:memberreceiveaddress:update")
+    @Override
     public R update(@RequestBody MemberReceiveAddressEntity memberReceiveAddress){
 		memberReceiveAddressService.updateById(memberReceiveAddress);
         return R.ok();
     }
 
-    /**
-     * 删除
-     */
-    @RequestMapping("/delete")
-    // @RequiresPermissions("member:memberreceiveaddress:delete")
+    @Override
     public R delete(@RequestBody Long[] ids){
 		memberReceiveAddressService.removeByIds(Arrays.asList(ids));
         return R.ok();
     }
+
 
 }

@@ -6,6 +6,8 @@ import io.swagger.annotations.Api;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.*;
 
+import java.math.BigDecimal;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -32,4 +34,10 @@ public interface ISkuInfoController {
 
     @PostMapping("/product/skuinfo/delete")
     R delete(@RequestBody Long[] skuIds);
+
+    @GetMapping("/product/skuinfo/{skuId}/price")
+    BigDecimal getPrice(@PathVariable("skuId") Long skuId);
+
+    @PostMapping("/product/skuinfo/listPrice")
+    List<SkuInfoEntity> getPriceBatch(@RequestBody List<Long> skuIdList);
 }

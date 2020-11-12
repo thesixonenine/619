@@ -94,4 +94,9 @@ public class MemberControllerImpl implements MemberController {
         }
         return R.ok().setData(member);
     }
+
+    @Override
+    public MemberEntity getById(Long id) {
+        return memberService.getById(id);
+    }
 }

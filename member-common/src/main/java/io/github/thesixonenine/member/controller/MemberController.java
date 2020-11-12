@@ -70,4 +70,7 @@ public interface MemberController {
     @GetMapping(value = "/member/member/login")
     R login(@RequestParam("username") String username,
             @RequestParam("password") String password);
+
+    @GetMapping("/member/info/{id}")
+    MemberEntity getById(@PathVariable("id") Long id);
 }

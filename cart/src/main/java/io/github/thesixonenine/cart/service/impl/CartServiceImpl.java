@@ -199,7 +199,8 @@ public class CartServiceImpl implements ICartService {
         return pair;
     }
 
-    private List<CartItem> getCartItemList() {
+    @Override
+    public List<CartItem> getCartItemList() {
         Pair<Long, String> pair = CartInterceptor.threadLocal.get();
         String key = CART_PREFIX + pair.getLeft();
         return getCartItemList(key);
