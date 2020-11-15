@@ -1,6 +1,6 @@
 package io.github.thesixonenine.order.vo;
 
-import lombok.Data;
+import org.apache.commons.collections4.CollectionUtils;
 
 import java.math.BigDecimal;
 import java.util.List;
@@ -13,8 +13,12 @@ import java.util.List;
  * @date 2020/11/12 21:29
  * @since 1.0
  */
-@Data
 public class OrderConfirmVO {
+
+    /**
+     * 防重令牌
+     */
+    private String orderToken;
 
     /**
      * 收货地址 ums_member_receive_address
@@ -37,4 +41,59 @@ public class OrderConfirmVO {
      * 应付/实付金额
      */
     private BigDecimal payAmt;
+
+
+    public OrderConfirmVO() {
+    }
+
+    public BigDecimal getTotalAmt() {
+        return amt();
+    }
+
+    public BigDecimal getPayAmt() {
+        return amt();
+    }
+
+    private BigDecimal amt() {
+        BigDecimal result = BigDecimal.ZERO;
+        if (CollectionUtils.isNotEmpty(cartItemList)) {
+            return result;
+        }
+        for (CartItemVO cartItemVO : cartItemList) {
+            result = result.add(cartItemVO.getPrice().multiply(new BigDecimal(cartItemVO.getCount())));
+        }
+        return result;
+    }
+
+    public String getOrderToken() {
+        return orderToken;
+    }
+
+    public List<MemberReceiveAddressVO> getAddressList() {
+        return addressList;
+    }
+
+    public List<CartItemVO> getCartItemList() {
+        return cartItemList;
+    }
+
+    public Integer getIntegration() {
+        return integration;
+    }
+
+    public void setOrderToken(String orderToken) {
+        this.orderToken = orderToken;
+    }
+
+    public void setAddressList(List<MemberReceiveAddressVO> addressList) {
+        this.addressList = addressList;
+    }
+
+    public void setCartItemList(List<CartItemVO> cartItemList) {
+        this.cartItemList = cartItemList;
+    }
+
+    public void setIntegration(Integer integration) {
+        this.integration = integration;
+    }
 }
