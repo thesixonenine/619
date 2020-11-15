@@ -60,6 +60,7 @@ public class OrderServiceImpl extends ServiceImpl<OrderDao, OrderEntity> impleme
     private OrderConfirmVO confirmOrderV2() {
         Long memberId = LoginInterceptor.threadLocal.get().getLeft();
         OrderConfirmVO orderConfirmVO = new OrderConfirmVO();
+
         // 改成异步后的问题:
         // feign在调用远程接口之前会应用我们自定义的Interceptor(io.github.thesixonenine.order.config.FeignConfig.requestInterceptor)
         // 以此来带上request中的Cookie中的会员信息, 因为主线程中有
