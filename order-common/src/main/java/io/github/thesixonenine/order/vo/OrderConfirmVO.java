@@ -33,6 +33,11 @@ public class OrderConfirmVO {
     private Integer integration;
 
     /**
+     * 商品总数量
+     */
+    private Integer skuCount;
+
+    /**
      * 订单总金额
      */
     private BigDecimal totalAmt;
@@ -56,13 +61,17 @@ public class OrderConfirmVO {
 
     private BigDecimal amt() {
         BigDecimal result = BigDecimal.ZERO;
-        if (CollectionUtils.isNotEmpty(cartItemList)) {
+        if (CollectionUtils.isEmpty(cartItemList)) {
             return result;
         }
         for (CartItemVO cartItemVO : cartItemList) {
             result = result.add(cartItemVO.getPrice().multiply(new BigDecimal(cartItemVO.getCount())));
         }
         return result;
+    }
+
+    public Integer getSkuCount() {
+        return cartItemList.stream().mapToInt(t->t.getCount()).sum();
     }
 
     public String getOrderToken() {
