@@ -51,6 +51,7 @@ spring:
     cache: false
   session:
     store-type: redis
-
+  main:
+    allow-bean-definition-overriding: true
 auth:
   sms-code: 123456

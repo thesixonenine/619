@@ -58,7 +58,11 @@ public class OrderServiceImpl extends ServiceImpl<OrderDao, OrderEntity> impleme
             addressList.add(vo);
         }
         orderConfirmVO.setAddressList(addressList);
-
+        // 调用远程服务获取当前的购物车
+        // 注意这里涉及到了用户登录状态的传递
+        // 也就是说不能直接使用feign提供的restTemplate来进行调用, 这样会丢失请求头header
+        // 需要添加feign请求拦截器, 加上请求头
+        // feign.SynchronousMethodHandler.executeAndDecode
         List<CartItem> cartItem = cartController.getCurrentCartItem();
 
         List<CartItemVO> cartItemList = new ArrayList<>(cartItem.size());

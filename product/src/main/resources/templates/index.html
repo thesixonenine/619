@@ -100,7 +100,7 @@
             <a href="http://auth.jdmall.com/login" th:if="${session.loginUser == null}">你好, 请登录</a>
           </li>
           <li>
-            <a href="http://auth.jdmall.com/reg" class="li_2">免费注册</a>
+            <a href="http://auth.jdmall.com/reg" class="li_2" th:if="${session.loginUser == null}">免费注册</a>
           </li>
           <span>|</span>
           <li>
