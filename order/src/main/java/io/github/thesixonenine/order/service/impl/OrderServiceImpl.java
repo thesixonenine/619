@@ -79,7 +79,7 @@ public class OrderServiceImpl extends ServiceImpl<OrderDao, OrderEntity> impleme
                 addressList.add(vo);
             }
             orderConfirmVO.setAddressList(addressList);
-        });
+        }, threadPoolExecutor);
         CompletableFuture<Void> getCartItemList = CompletableFuture.runAsync(() -> {
 
             RequestContextHolder.setRequestAttributes(attributes);
@@ -98,10 +98,10 @@ public class OrderServiceImpl extends ServiceImpl<OrderDao, OrderEntity> impleme
                 cartItemList.add(vo);
             }
             orderConfirmVO.setCartItemList(cartItemList);
-        });
+        }, threadPoolExecutor);
         CompletableFuture<Void> getMember = CompletableFuture.runAsync(() -> {
             orderConfirmVO.setIntegration(memberController.getById(memberId).getIntegration());
-        });
+        }, threadPoolExecutor);
 
         try {
             CompletableFuture.allOf(getAddr, getCartItemList, getMember).get();
