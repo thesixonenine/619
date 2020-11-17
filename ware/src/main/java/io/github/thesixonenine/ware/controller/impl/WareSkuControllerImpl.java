@@ -1,5 +1,6 @@
 package io.github.thesixonenine.ware.controller.impl;
 
+import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import io.github.thesixonenine.common.utils.PageUtils;
 import io.github.thesixonenine.common.utils.R;
 import io.github.thesixonenine.ware.controller.WareSkuController;
@@ -27,6 +28,7 @@ public class WareSkuControllerImpl implements WareSkuController {
     /**
      * 列表
      */
+    @Override
     public R list(Map<String, Object> params) {
         PageUtils page = wareSkuService.queryPage(params);
         return R.ok().put("page", page);
@@ -35,6 +37,7 @@ public class WareSkuControllerImpl implements WareSkuController {
     /**
      * 信息
      */
+    @Override
     public R info(Long id) {
         WareSkuEntity wareSku = wareSkuService.getById(id);
         return R.ok().put("wareSku", wareSku);
@@ -53,6 +56,7 @@ public class WareSkuControllerImpl implements WareSkuController {
     /**
      * 保存
      */
+    @Override
     public R save(WareSkuEntity wareSku) {
         wareSkuService.save(wareSku);
         return R.ok();
@@ -61,6 +65,7 @@ public class WareSkuControllerImpl implements WareSkuController {
     /**
      * 修改
      */
+    @Override
     public R update(WareSkuEntity wareSku) {
         wareSkuService.updateById(wareSku);
         return R.ok();
@@ -69,9 +74,22 @@ public class WareSkuControllerImpl implements WareSkuController {
     /**
      * 删除
      */
+    @Override
     public R delete(Long[] ids) {
         wareSkuService.removeByIds(Arrays.asList(ids));
         return R.ok();
+    }
+
+    @Override
+    public Map<Long, Integer> getSkuHasStock(List<Long> skuIdList) {
+        Map<Long, Integer> result = new HashMap<>();
+        Map<Long, List<WareSkuEntity>> map = wareSkuService.list(Wrappers.<WareSkuEntity>lambdaQuery().in(WareSkuEntity::getSkuId, skuIdList)).stream().collect(Collectors.groupingBy(WareSkuEntity::getSkuId));
+        for (Map.Entry<Long, List<WareSkuEntity>> entry : map.entrySet()) {
+            Long key = entry.getKey();
+            int sum = entry.getValue().stream().mapToInt(t -> t.getStock() - t.getStockLocked()).sum();
+            result.put(key, sum);
+        }
+        return result;
     }
 
 }

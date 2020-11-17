@@ -17,6 +17,8 @@ import io.github.thesixonenine.order.service.OrderService;
 import io.github.thesixonenine.order.vo.CartItemVO;
 import io.github.thesixonenine.order.vo.MemberReceiveAddressVO;
 import io.github.thesixonenine.order.vo.OrderConfirmVO;
+import io.github.thesixonenine.ware.controller.WareSkuController;
+import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -26,9 +28,11 @@ import org.springframework.web.context.request.RequestContextHolder;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ThreadPoolExecutor;
+import java.util.stream.Collectors;
 
 
 @Service("orderService")
@@ -41,6 +45,8 @@ public class OrderServiceImpl extends ServiceImpl<OrderDao, OrderEntity> impleme
     private MemberController memberController;
     @Autowired
     private ThreadPoolExecutor threadPoolExecutor;
+    @Autowired
+    private WareSkuController wareSkuController;
 
     @Override
     public PageUtils queryPage(Map<String, Object> params) {
@@ -99,7 +105,28 @@ public class OrderServiceImpl extends ServiceImpl<OrderDao, OrderEntity> impleme
                 cartItemList.add(vo);
             }
             orderConfirmVO.setCartItemList(cartItemList);
+        }, threadPoolExecutor).thenRunAsync(() -> {
+            // 继续查询库存信息
+            List<CartItemVO> cartItemList = orderConfirmVO.getCartItemList();
+            List<Long> skuIdList = cartItemList.stream().map(CartItemVO::getSkuId).collect(Collectors.toList());
+            if (CollectionUtils.isNotEmpty(skuIdList)) {
+                Map<Long, Integer> hasStock = wareSkuController.getSkuHasStock(skuIdList);
+                for (CartItemVO cartItemVO : cartItemList) {
+                    Integer stock = hasStock.get(cartItemVO.getSkuId());
+                    if (Objects.nonNull(stock)) {
+                        cartItemVO.setHasStock(stock > 0);
+                    }
+                }
+            }
+            for (CartItemVO cartItemVO : cartItemList) {
+                Boolean stock = cartItemVO.getHasStock();
+                if (Objects.isNull(stock)) {
+                    cartItemVO.setHasStock(false);
+                }
+            }
         }, threadPoolExecutor);
+
+
         CompletableFuture<Void> getMember = CompletableFuture.runAsync(() -> {
             orderConfirmVO.setIntegration(memberController.getById(memberId).getIntegration());
         }, threadPoolExecutor);

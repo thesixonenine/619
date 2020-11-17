@@ -55,4 +55,6 @@ public interface WareSkuController {
     @PostMapping("/ware/waresku/delete")
     R delete(@RequestBody Long[] ids);
 
+    @PostMapping("/ware/waresku/getSkuHasStock")
+    Map<Long/*skuId*/, Integer/*库存*/> getSkuHasStock(@RequestBody List<Long> skuIdList);
 }

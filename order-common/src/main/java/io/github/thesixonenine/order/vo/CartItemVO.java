@@ -20,5 +20,5 @@ public class CartItemVO {
     private Integer count;
     private BigDecimal totalPrice;
     private List<String> skuAttr;
-    private Boolean hasStock = true;
+    private Boolean hasStock;
 }
