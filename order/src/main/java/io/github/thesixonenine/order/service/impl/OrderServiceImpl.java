@@ -118,12 +118,7 @@ public class OrderServiceImpl extends ServiceImpl<OrderDao, OrderEntity> impleme
                     }
                 }
             }
-            for (CartItemVO cartItemVO : cartItemList) {
-                Boolean stock = cartItemVO.getHasStock();
-                if (Objects.isNull(stock)) {
-                    cartItemVO.setHasStock(false);
-                }
-            }
+
         }, threadPoolExecutor);
 
 
@@ -135,6 +130,13 @@ public class OrderServiceImpl extends ServiceImpl<OrderDao, OrderEntity> impleme
             CompletableFuture.allOf(getAddr, getCartItemList, getMember).get();
         } catch (InterruptedException | ExecutionException ignored) {
 
+        }
+        List<CartItemVO> cartItemList = orderConfirmVO.getCartItemList();
+        for (CartItemVO cartItemVO : cartItemList) {
+            Boolean stock = cartItemVO.getHasStock();
+            if (Objects.isNull(stock)) {
+                cartItemVO.setHasStock(false);
+            }
         }
         return orderConfirmVO;
     }

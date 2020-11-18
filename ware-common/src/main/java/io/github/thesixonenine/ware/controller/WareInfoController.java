@@ -6,6 +6,7 @@ import io.swagger.annotations.Api;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.*;
 
+import java.math.BigDecimal;
 import java.util.Map;
 
 
@@ -48,4 +49,6 @@ public interface WareInfoController {
     @PostMapping("/ware/wareinfo/delete")
     R delete(@RequestBody Long[] ids);
 
+    @GetMapping(value = "/ware/wareinfo/getFare")
+    BigDecimal getFare(@RequestParam(value = "addrId") Long addrId);
 }

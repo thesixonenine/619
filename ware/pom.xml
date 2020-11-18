@@ -27,7 +27,17 @@
             <version>0.0.1-SNAPSHOT</version>
         </dependency>
 
-
+        <dependency>
+            <groupId>io.github.thesixonenine</groupId>
+            <artifactId>member-common</artifactId>
+            <version>0.0.1-SNAPSHOT</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>io.github.thesixonenine</groupId>
+                    <artifactId>common</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-web</artifactId>

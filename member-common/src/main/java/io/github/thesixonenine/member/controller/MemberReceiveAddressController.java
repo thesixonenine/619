@@ -4,10 +4,7 @@ import io.github.thesixonenine.common.utils.R;
 import io.github.thesixonenine.member.entity.MemberReceiveAddressEntity;
 import io.swagger.annotations.Api;
 import org.springframework.cloud.openfeign.FeignClient;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.Map;
@@ -55,4 +52,7 @@ public interface MemberReceiveAddressController {
      */
     @RequestMapping(value = "member/memberreceiveaddress/delete")
     R delete(@RequestBody Long[] ids);
+
+    @GetMapping(value = "member/memberreceiveaddress/getById/{id}")
+    MemberReceiveAddressEntity getById(@PathVariable("id") Long id);
 }

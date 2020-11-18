@@ -67,5 +67,10 @@ public class MemberReceiveAddressControllerImpl implements MemberReceiveAddressC
         return R.ok();
     }
 
+    @Override
+    public MemberReceiveAddressEntity getById(Long id) {
+        return memberReceiveAddressService.getById(id);
+    }
+
 
 }

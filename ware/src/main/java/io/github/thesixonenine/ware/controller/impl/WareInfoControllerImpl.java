@@ -8,6 +8,7 @@ import io.github.thesixonenine.ware.service.WareInfoService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.math.BigDecimal;
 import java.util.Arrays;
 import java.util.Map;
 
@@ -26,6 +27,7 @@ public class WareInfoControllerImpl implements WareInfoController {
     /**
      * 列表
      */
+    @Override
     public R list(Map<String, Object> params) {
         PageUtils page = wareInfoService.queryPage(params);
         return R.ok().put("page", page);
@@ -34,6 +36,7 @@ public class WareInfoControllerImpl implements WareInfoController {
     /**
      * 信息
      */
+    @Override
     public R info(Long id) {
         WareInfoEntity wareInfo = wareInfoService.getById(id);
         return R.ok().put("wareInfo", wareInfo);
@@ -42,6 +45,7 @@ public class WareInfoControllerImpl implements WareInfoController {
     /**
      * 保存
      */
+    @Override
     public R save(WareInfoEntity wareInfo) {
         wareInfoService.save(wareInfo);
         return R.ok();
@@ -50,6 +54,7 @@ public class WareInfoControllerImpl implements WareInfoController {
     /**
      * 修改
      */
+    @Override
     public R update(WareInfoEntity wareInfo) {
         wareInfoService.updateById(wareInfo);
         return R.ok();
@@ -58,9 +63,15 @@ public class WareInfoControllerImpl implements WareInfoController {
     /**
      * 删除
      */
+    @Override
     public R delete(Long[] ids) {
         wareInfoService.removeByIds(Arrays.asList(ids));
         return R.ok();
+    }
+
+    @Override
+    public BigDecimal getFare(Long addrId) {
+        return wareInfoService.getFare(addrId);
     }
 
 }
