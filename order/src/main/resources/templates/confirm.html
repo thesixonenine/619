@@ -719,7 +719,14 @@
 				<p class="yfze_a"><span class="z">应付总额：</span><span class="hq">￥<b id="payPrice">[[${#numbers.formatDecimal(data.payAmt, 1, 2)}]]</b></span></p>
 				<p class="yfze_b">寄送至： 北京 朝阳区 三环到四环之间 朝阳北路复兴国际大厦23层麦田房产 IT-中心研发二部 收货人：赵存权 188****5052</p>
 			</div>
-			<button class="tijiao">提交订单</button>
+			<form action="http://order.jdmall.com/createOrder" method="post">
+				<input id="addrIdInput" type="hidden" name="addrId" />
+<!--				<input type="hidden" name="payType" />-->
+<!--				<input type="hidden" name="fare" />-->
+				<input id="orderTokenInput" type="hidden" name="orderToken" th:value="${data.orderToken}" />
+				<input id="payPriceInput" type="hidden" name="payPrice" />
+				<button class="tijiao" type="submit">提交订单</button>
+			</form>
 		</div>
 		</div>
 
@@ -968,12 +975,14 @@
 			});
 
 			function getFare(addrId) {
+				$("#addrIdInput").val(addrId);
 				$.get("http://jdmall.com/api/ware/wareinfo/getFare?addrId=" + addrId, function (data) {
 					console.log(data);
 					$("#fare").text(data);
 					var totalAmt = [[${data.totalAmt}]];
 
 					$("#payPrice").text(totalAmt * 1  + data * 1);
+					$("#payPriceInput").val(totalAmt * 1  + data * 1);
 				})
 			}
 		</script>

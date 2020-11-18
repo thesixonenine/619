@@ -19,6 +19,10 @@ public class Constant {
      * 临时用户在cookie中的标识名称
      */
     public static final String USER_KEY = "user-key";
+    /**
+     * 订单token的前缀
+     */
+    public static final String ORDER_TOKEN_PREFIX = "order:token:";
 	/** 超级管理员ID */
 	public static final int SUPER_ADMIN = 1;
     /**

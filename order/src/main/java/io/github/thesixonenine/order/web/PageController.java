@@ -1,12 +1,14 @@
 package io.github.thesixonenine.order.web;
 
 import io.github.thesixonenine.order.service.OrderService;
+import io.github.thesixonenine.order.vo.CreateOrderReq;
 import io.github.thesixonenine.order.vo.OrderConfirmVO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
 
 /**
  * @author Simple
@@ -30,5 +32,11 @@ public class PageController {
         OrderConfirmVO vo = orderService.confirmOrder();
         model.addAttribute("data", vo);
         return "confirm";
+    }
+
+    @PostMapping(value = "/createOrder")
+    public void createOrder(CreateOrderReq req) {
+        // TODO 创建订单
+        System.out.println(req);
     }
 }

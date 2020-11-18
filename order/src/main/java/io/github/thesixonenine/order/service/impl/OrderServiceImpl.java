@@ -5,6 +5,7 @@ import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import io.github.thesixonenine.cart.controller.ICartController;
 import io.github.thesixonenine.cart.vo.CartItem;
+import io.github.thesixonenine.common.utils.Constant;
 import io.github.thesixonenine.common.utils.PageUtils;
 import io.github.thesixonenine.common.utils.Query;
 import io.github.thesixonenine.member.controller.MemberController;
@@ -21,17 +22,16 @@ import io.github.thesixonenine.ware.controller.WareSkuController;
 import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.web.context.request.RequestAttributes;
 import org.springframework.web.context.request.RequestContextHolder;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 
@@ -47,6 +47,8 @@ public class OrderServiceImpl extends ServiceImpl<OrderDao, OrderEntity> impleme
     private ThreadPoolExecutor threadPoolExecutor;
     @Autowired
     private WareSkuController wareSkuController;
+    @Autowired
+    private StringRedisTemplate redisTemplate;
 
     @Override
     public PageUtils queryPage(Map<String, Object> params) {
@@ -138,6 +140,9 @@ public class OrderServiceImpl extends ServiceImpl<OrderDao, OrderEntity> impleme
                 cartItemVO.setHasStock(false);
             }
         }
+        String orderToken = UUID.randomUUID().toString().replace("-", "");
+        orderConfirmVO.setOrderToken(orderToken);
+        redisTemplate.opsForValue().set(Constant.ORDER_TOKEN_PREFIX + memberId, orderToken, 30, TimeUnit.MINUTES);
         return orderConfirmVO;
     }
 
