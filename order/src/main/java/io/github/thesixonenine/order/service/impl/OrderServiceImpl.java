@@ -15,14 +15,14 @@ import io.github.thesixonenine.order.dao.OrderDao;
 import io.github.thesixonenine.order.entity.OrderEntity;
 import io.github.thesixonenine.order.interceptor.LoginInterceptor;
 import io.github.thesixonenine.order.service.OrderService;
-import io.github.thesixonenine.order.vo.CartItemVO;
-import io.github.thesixonenine.order.vo.MemberReceiveAddressVO;
-import io.github.thesixonenine.order.vo.OrderConfirmVO;
+import io.github.thesixonenine.order.vo.*;
 import io.github.thesixonenine.ware.controller.WareSkuController;
 import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.StringRedisTemplate;
+import org.springframework.data.redis.core.script.DefaultRedisScript;
 import org.springframework.stereotype.Service;
 import org.springframework.web.context.request.RequestAttributes;
 import org.springframework.web.context.request.RequestContextHolder;
@@ -175,6 +175,29 @@ public class OrderServiceImpl extends ServiceImpl<OrderDao, OrderEntity> impleme
 
         orderConfirmVO.setIntegration(memberController.getById(memberId).getIntegration());
         return orderConfirmVO;
+    }
+
+    @Override
+    public CreateOrderResp createOrder(CreateOrderReq req) {
+        Long memberId = LoginInterceptor.threadLocal.get().getLeft();
+        CreateOrderResp resp = new CreateOrderResp();
+        // 1. 验证令牌
+        // 对比和删除必须保证原子性(使用lua脚本)
+        String orderToken = req.getOrderToken();
+        if (StringUtils.isEmpty(orderToken)) {
+            resp.setCode(1);
+            return resp;
+        }
+        String script = "if redis.call('get', KEY[1]) == ARGV[1] then return redis.call('del', KEY[1]) else return 0 end";
+        DefaultRedisScript<Long> redisScript = new DefaultRedisScript<>(script, Long.class);
+        // 0-失败 1-相同且删除成功
+        Long result = redisTemplate.execute(redisScript, Collections.singletonList(Constant.ORDER_TOKEN_PREFIX + memberId), orderToken);
+        if (Objects.isNull(result) || result != 1L) {
+            resp.setCode(2);
+            return resp;
+        }
+
+        return resp;
     }
 
 }

@@ -2,6 +2,7 @@ package io.github.thesixonenine.order.web;
 
 import io.github.thesixonenine.order.service.OrderService;
 import io.github.thesixonenine.order.vo.CreateOrderReq;
+import io.github.thesixonenine.order.vo.CreateOrderResp;
 import io.github.thesixonenine.order.vo.OrderConfirmVO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -35,8 +36,12 @@ public class PageController {
     }
 
     @PostMapping(value = "/createOrder")
-    public void createOrder(CreateOrderReq req) {
-        // TODO 创建订单
-        System.out.println(req);
+    public String createOrder(CreateOrderReq req) {
+        CreateOrderResp createOrderResp = orderService.createOrder(req);
+        if (createOrderResp.getCode() == 0) {
+            // 下单成功, 去支付选择页
+            return "pay";
+        }
+        return "redirect:http://order.jdmall.com/toTrade";
     }
 }

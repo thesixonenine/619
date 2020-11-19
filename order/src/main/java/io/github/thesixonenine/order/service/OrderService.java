@@ -3,6 +3,8 @@ package io.github.thesixonenine.order.service;
 import com.baomidou.mybatisplus.extension.service.IService;
 import io.github.thesixonenine.common.utils.PageUtils;
 import io.github.thesixonenine.order.entity.OrderEntity;
+import io.github.thesixonenine.order.vo.CreateOrderReq;
+import io.github.thesixonenine.order.vo.CreateOrderResp;
 import io.github.thesixonenine.order.vo.OrderConfirmVO;
 
 import java.util.Map;
@@ -24,5 +26,12 @@ public interface OrderService extends IService<OrderEntity> {
      */
     OrderConfirmVO confirmOrder();
 
+    /**
+     * 下单
+     *
+     * @param req 下单请求数据
+     * @return 下单返回数据
+     */
+    CreateOrderResp createOrder(CreateOrderReq req);
 }
 
