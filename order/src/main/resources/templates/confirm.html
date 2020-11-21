@@ -588,7 +588,7 @@
 			<!--</div>-->
 		<!--</div>-->
 		<!--主体部分-->
-		<p class="p1" style="text-align: center; text-indent: unset">填写并核对订单信息</p>
+		<p class="p1" style="text-align: center; text-indent: unset">填写并核对订单信息 <span style="color: red" th:if="${session.msg != null}" th:text="${session.msg}"></span></p>
 		<div class="section" style="margin: auto">
 			<!--收货人信息-->
 			<div class="top-2">

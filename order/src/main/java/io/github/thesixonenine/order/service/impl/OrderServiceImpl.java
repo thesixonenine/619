@@ -196,18 +196,14 @@ public class OrderServiceImpl extends ServiceImpl<OrderDao, OrderEntity> impleme
         // 对比和删除必须保证原子性(使用lua脚本)
         String orderToken = req.getOrderToken();
         if (StringUtils.isEmpty(orderToken)) {
-            log.warn("未上传订单令牌");
-            resp.setCode(1);
-            return resp;
+            throw new RuntimeException("未上传订单令牌");
         }
         String script = "if redis.call('get', KEY[1]) == ARGV[1] then return redis.call('del', KEY[1]) else return 0 end";
         DefaultRedisScript<Long> redisScript = new DefaultRedisScript<>(script, Long.class);
         // 0-失败 1-相同且删除成功
         Long result = redisTemplate.execute(redisScript, Collections.singletonList(Constant.ORDER_TOKEN_PREFIX + memberId), orderToken);
         if (Objects.isNull(result) || result != 1L) {
-            log.warn("验证令牌失败");
-            resp.setCode(2);
-            return resp;
+            throw new RuntimeException("验证令牌失败");
         }
 
         // 2. 生成订单号
@@ -284,9 +280,7 @@ public class OrderServiceImpl extends ServiceImpl<OrderDao, OrderEntity> impleme
 
         // 执行验价
         if (req.getPayPrice().multiply(Constant.HUNDRED).intValue() - order.getPayAmount().multiply(Constant.HUNDRED).intValue() >= 1) {
-            log.warn("验价失败");
-            resp.setCode(3);
-            return resp;
+            throw new RuntimeException("验价失败");
         }
 
         // 5. 保存订单数据
@@ -294,12 +288,9 @@ public class OrderServiceImpl extends ServiceImpl<OrderDao, OrderEntity> impleme
         orderItemService.saveBatch(orderItemList);
         // 6. 锁定库存
         Map<Long/* skuId */, Integer/* lockNum */> lockMap = new HashMap<>();
-        try {
-            wareSkuController.lockStock(orderSn, lockMap);
-        } catch (RuntimeException e) {
-            log.error("锁定库存失败[{}]", e.getMessage());
-            throw e;
-        }
+        wareSkuController.lockStock(orderSn, lockMap);
+        resp.setCode(0);
+        resp.setOrderEntity(order);
         return resp;
     }
 
