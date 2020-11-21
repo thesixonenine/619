@@ -721,8 +721,8 @@
 			</div>
 			<form action="http://order.jdmall.com/createOrder" method="post">
 				<input id="addrIdInput" type="hidden" name="addrId" />
-<!--				<input type="hidden" name="payType" />-->
-<!--				<input type="hidden" name="fare" />-->
+				<input type="hidden" name="payType" value="1" />
+				<input id="fareInput" type="hidden" name="fare" />
 				<input id="orderTokenInput" type="hidden" name="orderToken" th:value="${data.orderToken}" />
 				<input id="payPriceInput" type="hidden" name="payPrice" />
 				<button class="tijiao" type="submit">提交订单</button>
@@ -981,6 +981,7 @@
 					$("#fare").text(data);
 					var totalAmt = [[${data.totalAmt}]];
 
+					$("#fareInput").val(data * 1);
 					$("#payPrice").text(totalAmt * 1  + data * 1);
 					$("#payPriceInput").val(totalAmt * 1  + data * 1);
 				})
