@@ -198,7 +198,7 @@ public class OrderServiceImpl extends ServiceImpl<OrderDao, OrderEntity> impleme
         if (StringUtils.isEmpty(orderToken)) {
             throw new RuntimeException("未上传订单令牌");
         }
-        String script = "if redis.call('get', KEY[1]) == ARGV[1] then return redis.call('del', KEY[1]) else return 0 end";
+        String script = "if redis.call('get', KEYS[1]) == ARGV[1] then return redis.call('del', KEYS[1]) else return 0 end";
         DefaultRedisScript<Long> redisScript = new DefaultRedisScript<>(script, Long.class);
         // 0-失败 1-相同且删除成功
         Long result = redisTemplate.execute(redisScript, Collections.singletonList(Constant.ORDER_TOKEN_PREFIX + memberId), orderToken);
