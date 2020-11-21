@@ -8,6 +8,8 @@
 
 package io.github.thesixonenine.common.utils;
 
+import java.math.BigDecimal;
+
 /**
  * 常量
  *
@@ -23,6 +25,7 @@ public class Constant {
      * 订单token的前缀
      */
     public static final String ORDER_TOKEN_PREFIX = "order:token:";
+    public static final BigDecimal HUNDRED = new BigDecimal("100");
 	/** 超级管理员ID */
 	public static final int SUPER_ADMIN = 1;
     /**
