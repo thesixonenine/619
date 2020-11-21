@@ -16,6 +16,7 @@ import io.github.thesixonenine.order.dao.OrderDao;
 import io.github.thesixonenine.order.entity.OrderEntity;
 import io.github.thesixonenine.order.entity.OrderItemEntity;
 import io.github.thesixonenine.order.interceptor.LoginInterceptor;
+import io.github.thesixonenine.order.service.OrderItemService;
 import io.github.thesixonenine.order.service.OrderService;
 import io.github.thesixonenine.order.vo.*;
 import io.github.thesixonenine.product.controller.ISpuInfoController;
@@ -43,6 +44,8 @@ import java.util.stream.Collectors;
 @Slf4j
 @Service("orderService")
 public class OrderServiceImpl extends ServiceImpl<OrderDao, OrderEntity> implements OrderService {
+    @Autowired
+    private OrderItemService orderItemService;
     @Autowired
     private MemberReceiveAddressController memberReceiveAddressController;
     @Autowired
@@ -211,6 +214,8 @@ public class OrderServiceImpl extends ServiceImpl<OrderDao, OrderEntity> impleme
         String orderSn = IdWorker.getTimeId();
 
         OrderEntity order = new OrderEntity();
+        order.setMemberId(memberId);
+        order.setPayType(req.getPayType());
         order.setStatus(OrderEntity.OrderStatusEnum.CREATE_NEW.getCode());
         order.setAutoConfirmDay(7);
         order.setDeleteStatus(0);
@@ -282,6 +287,18 @@ public class OrderServiceImpl extends ServiceImpl<OrderDao, OrderEntity> impleme
             log.warn("验价失败");
             resp.setCode(3);
             return resp;
+        }
+
+        // 5. 保存订单数据
+        save(order);
+        orderItemService.saveBatch(orderItemList);
+        // 6. 锁定库存
+        Map<Long/* skuId */, Integer/* lockNum */> lockMap = new HashMap<>();
+        try {
+            wareSkuController.lockStock(orderSn, lockMap);
+        } catch (RuntimeException e) {
+            log.error("锁定库存失败[{}]", e.getMessage());
+            throw e;
         }
         return resp;
     }

@@ -57,4 +57,7 @@ public interface WareSkuController {
 
     @PostMapping("/ware/waresku/getSkuHasStock")
     Map<Long/*skuId*/, Integer/*库存*/> getSkuHasStock(@RequestBody List<Long> skuIdList);
+
+    @PostMapping("/ware/waresku/lock/stock/{orderSn}")
+    void lockStock(@PathVariable(value = "orderSn") String orderSn, @RequestBody Map<Long/* skuId */, Integer/* lockNum */> map) throws RuntimeException;
 }

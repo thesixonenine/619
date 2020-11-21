@@ -92,4 +92,9 @@ public class WareSkuControllerImpl implements WareSkuController {
         return result;
     }
 
+    @Override
+    public void lockStock(String orderSn, Map<Long/* skuId */, Integer/* lockNum */> map) throws RuntimeException {
+        wareSkuService.lockStock(orderSn, map);
+    }
+
 }

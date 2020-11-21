@@ -6,6 +6,7 @@ import io.github.thesixonenine.order.entity.OrderEntity;
 import io.github.thesixonenine.order.vo.CreateOrderReq;
 import io.github.thesixonenine.order.vo.CreateOrderResp;
 import io.github.thesixonenine.order.vo.OrderConfirmVO;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Map;
 
@@ -32,6 +33,7 @@ public interface OrderService extends IService<OrderEntity> {
      * @param req 下单请求数据
      * @return 下单返回数据
      */
+    @Transactional(rollbackFor = RuntimeException.class)
     CreateOrderResp createOrder(CreateOrderReq req);
 }
 

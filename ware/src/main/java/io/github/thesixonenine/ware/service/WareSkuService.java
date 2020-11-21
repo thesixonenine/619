@@ -3,6 +3,7 @@ package io.github.thesixonenine.ware.service;
 import com.baomidou.mybatisplus.extension.service.IService;
 import io.github.thesixonenine.common.utils.PageUtils;
 import io.github.thesixonenine.ware.entity.WareSkuEntity;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Map;
 
@@ -15,5 +16,8 @@ import java.util.Map;
 public interface WareSkuService extends IService<WareSkuEntity> {
 
     PageUtils queryPage(Map<String, Object> params);
+
+    @Transactional(rollbackFor = RuntimeException.class)
+    void lockStock(String orderSn, Map<Long/* skuId */, Integer/* lockNum */> map);
 }
 
