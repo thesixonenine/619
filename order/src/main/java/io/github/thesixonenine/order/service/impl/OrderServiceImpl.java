@@ -288,6 +288,9 @@ public class OrderServiceImpl extends ServiceImpl<OrderDao, OrderEntity> impleme
         orderItemService.saveBatch(orderItemList);
         // 6. 锁定库存
         Map<Long/* skuId */, Integer/* lockNum */> lockMap = new HashMap<>();
+        for (OrderItemEntity orderItemEntity : orderItemList) {
+            lockMap.put(orderItemEntity.getSkuId(), orderItemEntity.getSkuQuantity());
+        }
         wareSkuController.lockStock(orderSn, lockMap);
         resp.setCode(0);
         resp.setOrderEntity(order);
