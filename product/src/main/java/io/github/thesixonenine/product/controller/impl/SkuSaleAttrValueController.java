@@ -1,10 +1,11 @@
-package io.github.thesixonenine.product.controller;
+package io.github.thesixonenine.product.controller.impl;
 
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Map;
 
 // import org.apache.shiro.authz.annotation.RequiresPermissions;
+import io.github.thesixonenine.product.controller.ISkuSaleAttrValueController;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -26,7 +27,7 @@ import io.github.thesixonenine.common.utils.R;
  * @date 2020-06-06 00:59:35
  */
 @RestController
-public class SkuSaleAttrValueController implements ISkuSaleAttrValueController{
+public class SkuSaleAttrValueController implements ISkuSaleAttrValueController {
     @Autowired
     private SkuSaleAttrValueService skuSaleAttrValueService;
 

@@ -2,6 +2,7 @@ package io.github.thesixonenine.order.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.core.toolkit.IdWorker;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import io.github.thesixonenine.cart.controller.ICartController;
 import io.github.thesixonenine.cart.vo.CartItem;
@@ -13,9 +14,12 @@ import io.github.thesixonenine.member.controller.MemberReceiveAddressController;
 import io.github.thesixonenine.member.entity.MemberReceiveAddressEntity;
 import io.github.thesixonenine.order.dao.OrderDao;
 import io.github.thesixonenine.order.entity.OrderEntity;
+import io.github.thesixonenine.order.entity.OrderItemEntity;
 import io.github.thesixonenine.order.interceptor.LoginInterceptor;
 import io.github.thesixonenine.order.service.OrderService;
 import io.github.thesixonenine.order.vo.*;
+import io.github.thesixonenine.product.controller.ISpuInfoController;
+import io.github.thesixonenine.product.entity.SpuInfoEntity;
 import io.github.thesixonenine.ware.controller.WareSkuController;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -47,6 +51,8 @@ public class OrderServiceImpl extends ServiceImpl<OrderDao, OrderEntity> impleme
     private ThreadPoolExecutor threadPoolExecutor;
     @Autowired
     private WareSkuController wareSkuController;
+    @Autowired
+    private ISpuInfoController spuInfoController;
     @Autowired
     private StringRedisTemplate redisTemplate;
 
@@ -197,7 +203,57 @@ public class OrderServiceImpl extends ServiceImpl<OrderDao, OrderEntity> impleme
             return resp;
         }
 
+        // 2. 生成订单号
+        String orderSn = IdWorker.getTimeId();
+
+        OrderEntity order = new OrderEntity();
+        // 设置订单号
+        order.setOrderSn(orderSn);
+        // 设置运费信息
+        order.setFreightAmount(req.getFare());
+        // 设置收货人信息
+        MemberReceiveAddressEntity memberReceiveAddress = memberReceiveAddressController.getById(req.getAddrId());
+        order.setReceiverCity(memberReceiveAddress.getCity());
+        order.setReceiverDetailAddress(memberReceiveAddress.getDetailAddress());
+        order.setReceiverName(memberReceiveAddress.getName());
+        order.setReceiverPhone(memberReceiveAddress.getPhone());
+        order.setReceiverPostCode(memberReceiveAddress.getPostCode());
+        order.setReceiverProvince(memberReceiveAddress.getProvince());
+        order.setReceiverRegion(memberReceiveAddress.getRegion());
+
+        // 3. 设置订单项
+        List<CartItem> cartItem = cartController.getCurrentCartItem();
+        if (CollectionUtils.isNotEmpty(cartItem)) {
+            List<Long> skuIdList = cartItem.stream().map(CartItem::getSkuId).distinct().collect(Collectors.toList());
+            Map<Long/* skuId */, SpuInfoEntity> spuInfoEntityMap = spuInfoController.listBySkuId(skuIdList);
+            List<OrderItemEntity> orderItemList = cartItem.stream().map(item -> {
+                OrderItemEntity orderItemEntity = convertCartItemToOrderItem(item);
+                orderItemEntity.setOrderSn(orderSn);
+                SpuInfoEntity spuInfoEntity = spuInfoEntityMap.get(item.getSkuId());
+                if (Objects.nonNull(spuInfoEntity)) {
+                    orderItemEntity.setSpuId(spuInfoEntity.getId());
+                    orderItemEntity.setSpuBrand(spuInfoEntity.getBrandId().toString());
+                    orderItemEntity.setSpuName(spuInfoEntity.getSpuName());
+                    orderItemEntity.setCategoryId(spuInfoEntity.getCatalogId());
+                }
+                return orderItemEntity;
+            }).collect(Collectors.toList());
+        }
+
         return resp;
     }
 
+    private OrderItemEntity convertCartItemToOrderItem(CartItem cartItem) {
+        OrderItemEntity orderItem = new OrderItemEntity();
+        cartItem.getSkuId();
+        orderItem.setSkuId(cartItem.getSkuId());
+        orderItem.setSkuName(cartItem.getTitle());
+        orderItem.setSkuPic(cartItem.getImage());
+        orderItem.setSkuPrice(cartItem.getPrice());
+        orderItem.setSkuQuantity(cartItem.getCount());
+        orderItem.setSkuAttrsVals(String.join(",", cartItem.getSkuAttr()));
+        orderItem.setGiftGrowth(cartItem.getPrice().intValue());
+        orderItem.setGiftIntegration(cartItem.getPrice().intValue());
+        return orderItem;
+    }
 }

@@ -1,8 +1,9 @@
-package io.github.thesixonenine.product.controller;
+package io.github.thesixonenine.product.controller.impl;
 
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import io.github.thesixonenine.common.utils.PageUtils;
 import io.github.thesixonenine.common.utils.R;
+import io.github.thesixonenine.product.controller.ISkuInfoController;
 import io.github.thesixonenine.product.entity.SkuInfoEntity;
 import io.github.thesixonenine.product.service.SkuInfoService;
 import org.apache.commons.collections4.CollectionUtils;
@@ -22,7 +23,7 @@ import java.util.Map;
  * @date 2020-06-06 00:59:35
  */
 @RestController
-public class SkuInfoController implements ISkuInfoController{
+public class SkuInfoController implements ISkuInfoController {
     @Autowired
     private SkuInfoService skuInfoService;
 

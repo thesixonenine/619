@@ -6,7 +6,10 @@ import com.baomidou.mybatisplus.annotation.TableName;
 import java.math.BigDecimal;
 import java.io.Serializable;
 import java.util.Date;
+
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.Getter;
 
 /**
  * 订单
@@ -18,6 +21,41 @@ import lombok.Data;
 @TableName("oms_order")
 public class OrderEntity implements Serializable {
 	private static final long serialVersionUID = 1L;
+
+	@Getter
+	@AllArgsConstructor
+	public enum OrderStatusEnum {
+		/**
+		 * 0 - 待付款
+		 */
+		CREATE_NEW(0,"待付款"),
+		/**
+		 * 1 - 已付款
+		 */
+		PAYED(1,"已付款"),
+		/**
+		 * 2 - 已发货
+		 */
+		SENDED(2,"已发货"),
+		/**
+		 * 3 - 已完成
+		 */
+		RECIEVED(3,"已完成"),
+		/**
+		 * 4 - 已取消
+		 */
+		CANCLED(4,"已取消"),
+		/**
+		 * 5 - 售后中
+		 */
+		SERVICING(5,"售后中"),
+		/**
+		 * 6 - 售后完成
+		 */
+		SERVICED(6,"售后完成");
+		private Integer code;
+		private String msg;
+	}
 
 	/**
 	 * id
