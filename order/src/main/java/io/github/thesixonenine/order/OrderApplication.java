@@ -9,16 +9,27 @@ import org.springframework.amqp.core.MessageProperties;
 import org.springframework.amqp.rabbit.annotation.EnableRabbit;
 import org.springframework.amqp.rabbit.annotation.RabbitHandler;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
+import org.springframework.amqp.rabbit.connection.CorrelationData;
+import org.springframework.amqp.rabbit.core.RabbitTemplate;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.cloud.context.config.annotation.RefreshScope;
 import org.springframework.cloud.openfeign.EnableFeignClients;
 import org.springframework.session.data.redis.config.annotation.web.http.EnableRedisHttpSession;
 import org.springframework.stereotype.Component;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
 import springfox.documentation.swagger2.annotations.EnableSwagger2;
 
 import java.io.IOException;
+import java.util.Date;
+import java.util.UUID;
 
+import static io.github.thesixonenine.order.config.RabbitConfig.ORDER_DELAY_ROUTING_KEY;
+import static io.github.thesixonenine.order.config.RabbitConfig.ORDER_EVENT_EXCHANGE;
+
+@RestController
 @EnableRabbit
 @EnableRedisHttpSession
 @EnableSwagger2
@@ -32,6 +43,18 @@ public class OrderApplication {
         SpringApplication.run(OrderApplication.class, args);
     }
 
+    @Autowired
+    private RabbitTemplate rabbitTemplate;
+
+    @GetMapping(value = "/order/sendMQ")
+    public String sendMQ() {
+        OrderEntity order = new OrderEntity();
+        order.setOrderSn(UUID.randomUUID().toString().replace("-", ""));
+        order.setCreateTime(new Date());
+        rabbitTemplate.convertAndSend(ORDER_EVENT_EXCHANGE, ORDER_DELAY_ROUTING_KEY, order, new CorrelationData(UUID.randomUUID().toString()));
+        System.out.println("发送订单[" + order.getOrderSn() + "]成功");
+        return "ok";
+    }
 
     /**
      * 消息监听

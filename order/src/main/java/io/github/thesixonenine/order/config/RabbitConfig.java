@@ -1,7 +1,10 @@
 package io.github.thesixonenine.order.config;
 
+import com.rabbitmq.client.Channel;
+import io.github.thesixonenine.order.entity.OrderEntity;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.amqp.core.Message;
+import org.springframework.amqp.core.*;
+import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.amqp.rabbit.connection.ConnectionFactory;
 import org.springframework.amqp.rabbit.connection.CorrelationData;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
@@ -9,6 +12,10 @@ import org.springframework.amqp.support.converter.Jackson2JsonMessageConverter;
 import org.springframework.amqp.support.converter.MessageConverter;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+
+import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * @author Simple
@@ -23,10 +30,10 @@ public class RabbitConfig {
     // @Autowired
     // RabbitTemplate rabbitTemplate;
 
-    @Bean
-    public MessageConverter messageConverter() {
-        return new Jackson2JsonMessageConverter();
-    }
+    // @Bean
+    // public MessageConverter messageConverter() {
+    //     return new Jackson2JsonMessageConverter();
+    // }
 
     // @PostConstruct
     @Bean
@@ -68,5 +75,63 @@ public class RabbitConfig {
             }
         });
         return rabbitTemplate;
+    }
+
+
+    /**
+     * 订单事件交换机
+     */
+    public static final String ORDER_EVENT_EXCHANGE = "order-event-exchange";
+    /**
+     * 死信队列路由key
+     */
+    public static final String ORDER_DELAY_ROUTING_KEY = "order.delay.order";
+    public static final String ORDER_DELAY_QUEUE = "order.delay.queue";
+    /**
+     * 死信队列过期后路由到正常订单队列的key
+     */
+    public static final String ORDER_RELEASE_ROUTING_KEY = "order.release.order";
+    public static final String ORDER_RELEASE_QUEUE = "order.release.queue";
+
+    @Bean
+    public Queue delayQueue() {
+        // 死信队列
+        Map<String, Object> arguments = new HashMap<>();
+        arguments.put("x-dead-letter-exchange", ORDER_EVENT_EXCHANGE);
+        arguments.put("x-dead-letter-routing-key", ORDER_RELEASE_ROUTING_KEY);
+        arguments.put("x-message-ttl", 20 * 1000);
+        // 是否持久化 true, 是否排他 false 是否自动删除false
+        return new Queue(ORDER_DELAY_QUEUE, true, false, false, arguments);
+    }
+    @Bean
+    public Queue orderReleaseQueue() {
+        return new Queue(ORDER_RELEASE_QUEUE, true, false, false);
+    }
+    @Bean
+    public Exchange orderEventExchange() {
+        return new TopicExchange(ORDER_EVENT_EXCHANGE, true, false);
+    }
+    @Bean
+    public Binding orderReleaseBinding() {
+        return new Binding(ORDER_DELAY_QUEUE, Binding.DestinationType.QUEUE, ORDER_EVENT_EXCHANGE, ORDER_DELAY_ROUTING_KEY, null);
+    }
+    @Bean
+    public Binding releaseOrderBinding() {
+        return new Binding(ORDER_RELEASE_QUEUE, Binding.DestinationType.QUEUE, ORDER_EVENT_EXCHANGE, ORDER_RELEASE_ROUTING_KEY, null);
+    }
+
+    @RabbitListener(queues = {ORDER_RELEASE_QUEUE})
+    public void listener(Message message, OrderEntity orderEntity, Channel channel) {
+        MessageProperties messageProperties = message.getMessageProperties();
+        // deliveryTag在channel中是自增的
+        long deliveryTag = messageProperties.getDeliveryTag();
+        System.out.println("订单[" + orderEntity.getOrderSn() + "]接收成功");
+        try {
+            // 确认收到消息, 可以从broker中移除
+            // multiple 是否批量ack, 批量ack这个channel中的消息
+            channel.basicAck(deliveryTag, false);
+        } catch (IOException e) {
+            // ack失败
+        }
     }
 }
