@@ -121,11 +121,11 @@ public class RabbitConfig {
     }
 
     @RabbitListener(queues = {ORDER_RELEASE_QUEUE})
-    public void listener(Message message, OrderEntity orderEntity, Channel channel) {
+    public void listener(OrderEntity orderEntity, Message message, Channel channel) {
         MessageProperties messageProperties = message.getMessageProperties();
         // deliveryTag在channel中是自增的
         long deliveryTag = messageProperties.getDeliveryTag();
-        System.out.println("订单[" + orderEntity.getOrderSn() + "]接收成功");
+        log.info("订单[" + orderEntity.getOrderSn() + "]接收成功");
         try {
             // 确认收到消息, 可以从broker中移除
             // multiple 是否批量ack, 批量ack这个channel中的消息

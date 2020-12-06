@@ -3,6 +3,7 @@ package io.github.thesixonenine.order;
 import com.rabbitmq.client.Channel;
 import io.github.thesixonenine.order.entity.OrderEntity;
 import io.github.thesixonenine.order.entity.OrderReturnReasonEntity;
+import lombok.extern.slf4j.Slf4j;
 import org.mybatis.spring.annotation.MapperScan;
 import org.springframework.amqp.core.Message;
 import org.springframework.amqp.core.MessageProperties;
@@ -28,7 +29,7 @@ import java.util.UUID;
 
 import static io.github.thesixonenine.order.config.RabbitConfig.ORDER_DELAY_ROUTING_KEY;
 import static io.github.thesixonenine.order.config.RabbitConfig.ORDER_EVENT_EXCHANGE;
-
+@Slf4j
 @RestController
 @EnableRabbit
 @EnableRedisHttpSession
@@ -52,7 +53,7 @@ public class OrderApplication {
         order.setOrderSn(UUID.randomUUID().toString().replace("-", ""));
         order.setCreateTime(new Date());
         rabbitTemplate.convertAndSend(ORDER_EVENT_EXCHANGE, ORDER_DELAY_ROUTING_KEY, order, new CorrelationData(UUID.randomUUID().toString()));
-        System.out.println("发送订单[" + order.getOrderSn() + "]成功");
+        log.info("发送订单[" + order.getOrderSn() + "]成功");
         return "ok";
     }
 
