@@ -39,5 +39,13 @@ public class WareOrderTaskDetailEntity implements Serializable {
 	 * 工作单id
 	 */
 	private Long taskId;
+	/**
+	 * 仓库id
+	 */
+	private Long wareId;
+	/**
+	 * 状态: 1-锁定 2-解锁 3-已扣减
+	 */
+	private Integer lockStatus;
 
 }

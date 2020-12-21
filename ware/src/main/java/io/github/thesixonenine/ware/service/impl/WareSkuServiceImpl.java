@@ -10,6 +10,8 @@ import io.github.thesixonenine.ware.dao.WareSkuDao;
 import io.github.thesixonenine.ware.entity.WareSkuEntity;
 import io.github.thesixonenine.ware.service.WareSkuService;
 import org.apache.commons.collections4.CollectionUtils;
+import org.springframework.amqp.rabbit.core.RabbitTemplate;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
@@ -22,6 +24,8 @@ public class WareSkuServiceImpl extends ServiceImpl<WareSkuDao, WareSkuEntity> i
 
     @Resource
     private WareSkuDao wareSkuDao;
+    @Autowired
+    private RabbitTemplate rabbitTemplate;
 
     @Override
     public PageUtils queryPage(Map<String, Object> params) {
@@ -33,6 +37,16 @@ public class WareSkuServiceImpl extends ServiceImpl<WareSkuDao, WareSkuEntity> i
         return new PageUtils(page);
     }
 
+    /**
+     * 锁定库存
+     *
+     * 库存解锁的场景:
+     * 1. 下单成功但未支付, 被顾客手动/系统自动取消
+     * 2. 下单成功, 库存锁定成功, 接下来的其他业务失败导致订单回滚, 需回滚库存
+     *
+     * @param orderSn 订单号
+     * @param map 锁定信息
+     */
     @Override
     public void lockStock(String orderSn, Map<Long/* skuId */, Integer/* lockNum */> map) {
         for (Map.Entry<Long, Integer> entry : map.entrySet()) {
@@ -46,6 +60,7 @@ public class WareSkuServiceImpl extends ServiceImpl<WareSkuDao, WareSkuEntity> i
             for (Long wareId : wareIdList) {
                 if (SqlHelper.retBool(wareSkuDao.lockStock(skuId, wareId, num))) {
                     lock = true;
+                    // 发送MQ消息以便解锁
                     break;
                 }
             }
