@@ -2,6 +2,7 @@ package io.github.thesixonenine.ware.service;
 
 import com.baomidou.mybatisplus.extension.service.IService;
 import io.github.thesixonenine.common.utils.PageUtils;
+import io.github.thesixonenine.ware.dto.mq.StockLockedDTO;
 import io.github.thesixonenine.ware.entity.WareSkuEntity;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -19,5 +20,8 @@ public interface WareSkuService extends IService<WareSkuEntity> {
 
     @Transactional(rollbackFor = RuntimeException.class)
     void lockStock(String orderSn, Map<Long/* skuId */, Integer/* lockNum */> map);
+
+    @Transactional(rollbackFor = RuntimeException.class)
+    void unLockStock(StockLockedDTO dto);
 }
 

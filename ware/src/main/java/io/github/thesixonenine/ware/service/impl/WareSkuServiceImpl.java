@@ -6,11 +6,18 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.baomidou.mybatisplus.extension.toolkit.SqlHelper;
 import io.github.thesixonenine.common.utils.PageUtils;
 import io.github.thesixonenine.common.utils.Query;
+import io.github.thesixonenine.ware.config.RabbitConfig;
 import io.github.thesixonenine.ware.dao.WareSkuDao;
+import io.github.thesixonenine.ware.dto.mq.StockLockedDTO;
+import io.github.thesixonenine.ware.entity.WareOrderTaskDetailEntity;
+import io.github.thesixonenine.ware.entity.WareOrderTaskEntity;
 import io.github.thesixonenine.ware.entity.WareSkuEntity;
+import io.github.thesixonenine.ware.service.WareOrderTaskDetailService;
+import io.github.thesixonenine.ware.service.WareOrderTaskService;
 import io.github.thesixonenine.ware.service.WareSkuService;
 import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -24,6 +31,10 @@ public class WareSkuServiceImpl extends ServiceImpl<WareSkuDao, WareSkuEntity> i
 
     @Resource
     private WareSkuDao wareSkuDao;
+    @Autowired
+    private WareOrderTaskService wareOrderTaskService;
+    @Autowired
+    private WareOrderTaskDetailService wareOrderTaskDetailService;
     @Autowired
     private RabbitTemplate rabbitTemplate;
 
@@ -49,6 +60,12 @@ public class WareSkuServiceImpl extends ServiceImpl<WareSkuDao, WareSkuEntity> i
      */
     @Override
     public void lockStock(String orderSn, Map<Long/* skuId */, Integer/* lockNum */> map) {
+        // 保存库存工作单
+        WareOrderTaskEntity task = new WareOrderTaskEntity();
+        task.setOrderSn(orderSn);
+        wareOrderTaskService.save(task);
+        Long taskId = task.getId();
+
         for (Map.Entry<Long, Integer> entry : map.entrySet()) {
             boolean lock = false;
             Long skuId = entry.getKey();
@@ -57,10 +74,27 @@ public class WareSkuServiceImpl extends ServiceImpl<WareSkuDao, WareSkuEntity> i
             if (CollectionUtils.isEmpty(wareIdList)) {
                 throw new RuntimeException("商品" + skuId + "库存不足01");
             }
+            // 如果循环中某个锁定失败, 则数据库回滚, 之前发出去的mq消息找不到对应的工作单, 不会回滚
             for (Long wareId : wareIdList) {
                 if (SqlHelper.retBool(wareSkuDao.lockStock(skuId, wareId, num))) {
                     lock = true;
+
+
+                    // 保存库存工作单详情
+                    WareOrderTaskDetailEntity detail = new WareOrderTaskDetailEntity();
+                    detail.setSkuId(skuId);
+                    detail.setSkuNum(num);
+                    detail.setTaskId(taskId);
+                    detail.setWareId(wareId);
+                    detail.setLockStatus(WareOrderTaskDetailEntity.LockStatusEnum.LOCKED.getCode());
+                    wareOrderTaskDetailService.save(detail);
                     // 发送MQ消息以便解锁
+                    StockLockedDTO stockLockedDTO = new StockLockedDTO();
+                    BeanUtils.copyProperties(detail, stockLockedDTO);
+                    stockLockedDTO.setDetailId(detail.getId());
+                    rabbitTemplate.convertAndSend(RabbitConfig.STOCK_EVENT_EXCHANGE, RabbitConfig.STOCK_LOCKED_ROUTING_KEY, stockLockedDTO);
+
+
                     break;
                 }
             }
@@ -68,6 +102,11 @@ public class WareSkuServiceImpl extends ServiceImpl<WareSkuDao, WareSkuEntity> i
                 throw new RuntimeException("商品" + skuId + "库存不足02");
             }
         }
+    }
+
+    @Override
+    public void unLockStock(StockLockedDTO dto) {
+        wareSkuDao.unLockStock(dto);
     }
 
 }

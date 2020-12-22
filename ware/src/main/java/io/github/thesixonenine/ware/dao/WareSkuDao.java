@@ -1,6 +1,7 @@
 package io.github.thesixonenine.ware.dao;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+import io.github.thesixonenine.ware.dto.mq.StockLockedDTO;
 import io.github.thesixonenine.ware.entity.WareSkuEntity;
 import org.apache.ibatis.annotations.Param;
 
@@ -25,4 +26,6 @@ public interface WareSkuDao extends BaseMapper<WareSkuEntity> {
     Integer lockStock(@Param(value = "skuId") Long skuId,
                       @Param(value = "wareId") Long wareId,
                       @Param(value = "num") Integer num);
+
+    void unLockStock(StockLockedDTO dto);
 }

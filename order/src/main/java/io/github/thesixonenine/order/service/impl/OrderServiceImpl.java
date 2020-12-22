@@ -292,6 +292,7 @@ public class OrderServiceImpl extends ServiceImpl<OrderDao, OrderEntity> impleme
             lockMap.put(orderItemEntity.getSkuId(), orderItemEntity.getSkuQuantity());
         }
         wareSkuController.lockStock(orderSn, lockMap);
+        int i = 10/0;
         resp.setCode(0);
         resp.setOrderEntity(order);
         return resp;

@@ -24,6 +24,7 @@ public class PurchaseDetailControllerImpl implements PurchaseDetailController {
     /**
      * 列表
      */
+    @Override
     public R list(Map<String, Object> params) {
         PageUtils page = purchaseDetailService.queryPage(params);
         return R.ok().put("page", page);
@@ -32,6 +33,7 @@ public class PurchaseDetailControllerImpl implements PurchaseDetailController {
     /**
      * 信息
      */
+    @Override
     public R info(Long id) {
         PurchaseDetailEntity purchaseDetail = purchaseDetailService.getById(id);
         return R.ok().put("purchaseDetail", purchaseDetail);
@@ -40,6 +42,7 @@ public class PurchaseDetailControllerImpl implements PurchaseDetailController {
     /**
      * 保存
      */
+    @Override
     public R save(PurchaseDetailEntity purchaseDetail) {
         purchaseDetailService.save(purchaseDetail);
         return R.ok();
@@ -48,6 +51,7 @@ public class PurchaseDetailControllerImpl implements PurchaseDetailController {
     /**
      * 修改
      */
+    @Override
     public R update(PurchaseDetailEntity purchaseDetail) {
         purchaseDetailService.updateById(purchaseDetail);
         return R.ok();
@@ -56,6 +60,7 @@ public class PurchaseDetailControllerImpl implements PurchaseDetailController {
     /**
      * 删除
      */
+    @Override
     public R delete(Long[] ids) {
         purchaseDetailService.removeByIds(Arrays.asList(ids));
         return R.ok();

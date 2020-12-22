@@ -75,13 +75,4 @@ public class RabbitConfig {
         return new Binding(STOCK_DELAY_QUEUE, Binding.DestinationType.QUEUE, STOCK_EVENT_EXCHANGE, STOCK_LOCKED_ROUTING_KEY, null);
     }
 
-
-
-
-
-    @RabbitListener(queues = {STOCK_RELEASE_QUEUE})
-    public void listener(Message message) {
-        MessageProperties messageProperties = message.getMessageProperties();
-        log.info("库存释放消息接收成功[{}]", messageProperties.getMessageId());
-    }
 }

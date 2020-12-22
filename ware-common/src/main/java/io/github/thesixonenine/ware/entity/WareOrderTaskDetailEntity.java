@@ -5,7 +5,10 @@ import com.baomidou.mybatisplus.annotation.TableName;
 
 import java.io.Serializable;
 import java.util.Date;
+
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.Getter;
 
 /**
  * 库存工作单
@@ -48,4 +51,22 @@ public class WareOrderTaskDetailEntity implements Serializable {
 	 */
 	private Integer lockStatus;
 
+	@Getter
+	@AllArgsConstructor
+	public enum LockStatusEnum{
+		/**
+		 * 1-锁定
+		 */
+		LOCKED(1, "锁定"),
+		/**
+		 * 2-解锁
+		 */
+		UNLOCK(2, "解锁"),
+		/**
+		 * 3-已扣减
+		 */
+		REDUCED(3, "已扣减");
+		private Integer code;
+		private String status;
+	}
 }
