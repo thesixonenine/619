@@ -1,5 +1,6 @@
 package io.github.thesixonenine.order.controller;
 
+import io.github.thesixonenine.common.annotation.Anonymous;
 import io.github.thesixonenine.common.utils.R;
 import io.github.thesixonenine.order.entity.OrderEntity;
 import io.swagger.annotations.Api;
@@ -33,6 +34,7 @@ public interface OrderController {
     @PostMapping("/order/order/delete")
     R delete(@RequestBody Long[] ids);
 
+    @Anonymous
     @GetMapping("/order/order/info/ordersn/{orderSn}")
     OrderEntity getByOrderSn(@PathVariable("orderSn") String orderSn);
 }

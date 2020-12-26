@@ -1,8 +1,10 @@
 package io.github.thesixonenine.order.interceptor;
 
+import io.github.thesixonenine.common.annotation.Anonymous;
 import io.github.thesixonenine.common.utils.Constant;
 import io.github.thesixonenine.member.entity.MemberEntity;
 import org.apache.commons.lang3.tuple.Pair;
+import org.springframework.web.method.HandlerMethod;
 import org.springframework.web.servlet.HandlerInterceptor;
 
 import javax.servlet.http.HttpServletRequest;
@@ -21,6 +23,14 @@ public class LoginInterceptor implements HandlerInterceptor {
 
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
+        if(!(handler instanceof HandlerMethod)){
+            return false;
+        }
+        HandlerMethod handlerMethod = (HandlerMethod) handler;
+        Anonymous anonymous = handlerMethod.getMethodAnnotation(Anonymous.class);
+        if (Objects.nonNull(anonymous)) {
+            return true;
+        }
         HttpSession session = request.getSession();
         MemberEntity member = (MemberEntity) session.getAttribute(Constant.LOGIN_USER);
         if (member == null) {
