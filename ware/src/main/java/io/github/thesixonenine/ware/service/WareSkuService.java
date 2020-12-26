@@ -22,6 +22,6 @@ public interface WareSkuService extends IService<WareSkuEntity> {
     void lockStock(String orderSn, Map<Long/* skuId */, Integer/* lockNum */> map);
 
     @Transactional(rollbackFor = RuntimeException.class)
-    void unLockStock(StockLockedDTO dto);
+    int unLockStock(StockLockedDTO dto);
 }
 

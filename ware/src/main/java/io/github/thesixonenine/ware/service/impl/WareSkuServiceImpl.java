@@ -105,8 +105,8 @@ public class WareSkuServiceImpl extends ServiceImpl<WareSkuDao, WareSkuEntity> i
     }
 
     @Override
-    public void unLockStock(StockLockedDTO dto) {
-        wareSkuDao.unLockStock(dto);
+    public int unLockStock(StockLockedDTO dto) {
+        return wareSkuDao.unLockStock(dto);
     }
 
 }

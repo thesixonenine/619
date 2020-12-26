@@ -1,5 +1,6 @@
 package io.github.thesixonenine.ware.mq.handler;
 
+import com.rabbitmq.client.Channel;
 import io.github.thesixonenine.order.controller.OrderController;
 import io.github.thesixonenine.order.entity.OrderEntity;
 import io.github.thesixonenine.ware.config.RabbitConfig;
@@ -16,6 +17,7 @@ import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import java.io.IOException;
 import java.util.Objects;
 
 /**
@@ -41,11 +43,13 @@ public class StockReleaseQueueHandler {
     /**
      * 库存解锁
      *
+     * 启用手动ack, 避免在解锁失败后消息被删除了
+     *
      * @param dto
      * @param message
      */
     @RabbitHandler
-    public void listener(StockLockedDTO dto, Message message) {
+    public void listener(StockLockedDTO dto, Message message, Channel channel) throws IOException {
         log.info("收到库存解锁的消息[{}]", dto);
         Long detailId = dto.getDetailId();
         Long taskId = dto.getTaskId();
@@ -53,6 +57,7 @@ public class StockReleaseQueueHandler {
         WareOrderTaskDetailEntity taskDetail = wareOrderTaskDetailService.getById(detailId);
         if (Objects.isNull(taskDetail)) {
             // 无需解锁
+            channel.basicAck(message.getMessageProperties().getDeliveryTag(), false);
             return;
         }
         // 查询订单是否存在, 没有则证明下订单的事务已经回滚, 没有创建任何订单, 需要解锁库存
@@ -62,7 +67,12 @@ public class StockReleaseQueueHandler {
         // 查询订单状态, 如果是已取消, 则需要解锁库存, 否则不能解锁(待支付/已付款/已发货...)
         if (Objects.isNull(order) || OrderEntity.OrderStatusEnum.CANCLED.getCode().equals(order.getStatus())) {
             // 解锁库存
-            wareSkuService.unLockStock(dto);
+            if (wareSkuService.unLockStock(dto) > 0) {
+                channel.basicAck(message.getMessageProperties().getDeliveryTag(), false);
+            };
+        } else {
+            // 消息拒绝 重新放入队列 继续消费解锁
+            channel.basicReject(message.getMessageProperties().getDeliveryTag(), true);
         }
     }
 }
