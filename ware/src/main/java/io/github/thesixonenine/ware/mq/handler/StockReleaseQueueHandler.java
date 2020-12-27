@@ -72,7 +72,19 @@ public class StockReleaseQueueHandler {
             };
         } else {
             // 消息拒绝 重新放入队列 继续消费解锁
+            log.debug("订单[{}]不存在或订单状态不是已取消", orderSn);
             channel.basicReject(message.getMessageProperties().getDeliveryTag(), true);
         }
+    }
+
+    /**
+     * 处理订单关闭后的解锁库存
+     * @param order
+     * @param message
+     * @param channel
+     */
+    @RabbitListener
+    public void handleOrderCloseRelease(OrderEntity order, Message message, Channel channel) {
+        log.info("订单关闭准备解锁库存");
     }
 }

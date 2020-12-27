@@ -35,5 +35,11 @@ public interface OrderService extends IService<OrderEntity> {
      */
     @Transactional(rollbackFor = RuntimeException.class)
     CreateOrderResp createOrder(CreateOrderReq req);
+
+    /**
+     * 关单
+     * @param orderEntity 订单信息
+     */
+    void closeOrder(OrderEntity orderEntity);
 }
 

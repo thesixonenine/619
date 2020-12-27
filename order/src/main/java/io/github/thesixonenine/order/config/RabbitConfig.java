@@ -92,7 +92,6 @@ public class RabbitConfig {
      */
     public static final String ORDER_RELEASE_ROUTING_KEY = "order.release.order";
     public static final String ORDER_RELEASE_QUEUE = "order.release.queue";
-
     @Bean
     public Queue delayQueue() {
         // 死信队列
@@ -103,6 +102,7 @@ public class RabbitConfig {
         // 是否持久化 true, 是否排他 false 是否自动删除false
         return new Queue(ORDER_DELAY_QUEUE, true, false, false, arguments);
     }
+
     @Bean
     public Queue orderReleaseQueue() {
         return new Queue(ORDER_RELEASE_QUEUE, true, false, false);
@@ -112,26 +112,22 @@ public class RabbitConfig {
         return new TopicExchange(ORDER_EVENT_EXCHANGE, true, false);
     }
     @Bean
-    public Binding orderReleaseBinding() {
+    public Binding orderCreateBinding() {
         return new Binding(ORDER_DELAY_QUEUE, Binding.DestinationType.QUEUE, ORDER_EVENT_EXCHANGE, ORDER_DELAY_ROUTING_KEY, null);
     }
     @Bean
-    public Binding releaseOrderBinding() {
+    public Binding orderReleaseBinding() {
         return new Binding(ORDER_RELEASE_QUEUE, Binding.DestinationType.QUEUE, ORDER_EVENT_EXCHANGE, ORDER_RELEASE_ROUTING_KEY, null);
     }
 
-    @RabbitListener(queues = {ORDER_RELEASE_QUEUE})
-    public void listener(OrderEntity orderEntity, Message message, Channel channel) {
-        MessageProperties messageProperties = message.getMessageProperties();
-        // deliveryTag在channel中是自增的
-        long deliveryTag = messageProperties.getDeliveryTag();
-        log.info("订单[" + orderEntity.getOrderSn() + "]接收成功");
-        try {
-            // 确认收到消息, 可以从broker中移除
-            // multiple 是否批量ack, 批量ack这个channel中的消息
-            channel.basicAck(deliveryTag, false);
-        } catch (IOException e) {
-            // ack失败
-        }
+
+    public static final String ORDER_RELEASE_OTHER_KEY = "order.release.other.#";
+
+    /**
+     * 订单释放直接绑定库存释放
+     */
+    @Bean
+    public Binding orderReleaseOtherBinding() {
+        return new Binding("stock.release.queue", Binding.DestinationType.QUEUE, ORDER_EVENT_EXCHANGE, ORDER_RELEASE_OTHER_KEY, null);
     }
 }

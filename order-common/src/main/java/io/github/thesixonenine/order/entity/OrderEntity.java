@@ -7,9 +7,7 @@ import java.math.BigDecimal;
 import java.io.Serializable;
 import java.util.Date;
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.Getter;
+import lombok.*;
 
 /**
  * 订单
@@ -17,6 +15,9 @@ import lombok.Getter;
  * @author thesixonenine
  * @date 2020-06-06 01:47:54
  */
+@Builder
+@AllArgsConstructor
+@NoArgsConstructor
 @Data
 @TableName("oms_order")
 public class OrderEntity implements Serializable {

@@ -12,6 +12,7 @@ import io.github.thesixonenine.common.utils.Query;
 import io.github.thesixonenine.member.controller.MemberController;
 import io.github.thesixonenine.member.controller.MemberReceiveAddressController;
 import io.github.thesixonenine.member.entity.MemberReceiveAddressEntity;
+import io.github.thesixonenine.order.config.RabbitConfig;
 import io.github.thesixonenine.order.dao.OrderDao;
 import io.github.thesixonenine.order.entity.OrderEntity;
 import io.github.thesixonenine.order.entity.OrderItemEntity;
@@ -25,6 +26,7 @@ import io.github.thesixonenine.ware.controller.WareSkuController;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.StringRedisTemplate;
@@ -60,6 +62,8 @@ public class OrderServiceImpl extends ServiceImpl<OrderDao, OrderEntity> impleme
     private ISpuInfoController spuInfoController;
     @Autowired
     private StringRedisTemplate redisTemplate;
+    @Autowired
+    private RabbitTemplate rabbitTemplate;
 
     @Override
     public PageUtils queryPage(Map<String, Object> params) {
@@ -292,10 +296,25 @@ public class OrderServiceImpl extends ServiceImpl<OrderDao, OrderEntity> impleme
             lockMap.put(orderItemEntity.getSkuId(), orderItemEntity.getSkuQuantity());
         }
         wareSkuController.lockStock(orderSn, lockMap);
-        int i = 10/0;
+        // int i = 10/0;
         resp.setCode(0);
         resp.setOrderEntity(order);
+        // 订单创建成功, 发送MQ消息 发到死信队列
+        rabbitTemplate.convertAndSend(RabbitConfig.ORDER_EVENT_EXCHANGE, RabbitConfig.ORDER_DELAY_ROUTING_KEY, order);
         return resp;
+    }
+
+    @Override
+    public void closeOrder(OrderEntity order) {
+        log.debug("开始关单[{}]", order.getOrderSn());
+        Long id = order.getId();
+        OrderEntity orderEntity = getById(id);
+        if (OrderEntity.OrderStatusEnum.CREATE_NEW.getCode().equals(orderEntity.getStatus())) {
+            // 关单
+            updateById(OrderEntity.builder().id(id).status(OrderEntity.OrderStatusEnum.CANCLED.getCode()).build());
+            // 发送MQ
+            rabbitTemplate.convertAndSend(RabbitConfig.ORDER_EVENT_EXCHANGE, "order.release.other", orderEntity);
+        }
     }
 
     private OrderItemEntity convertCartItemToOrderItem(CartItem cartItem) {
