@@ -6,9 +6,7 @@ import com.baomidou.mybatisplus.annotation.TableName;
 import java.io.Serializable;
 import java.util.Date;
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.Getter;
+import lombok.*;
 
 /**
  * 库存工作单
@@ -16,6 +14,9 @@ import lombok.Getter;
  * @author thesixonenine
  * @date 2020-06-06 01:52:04
  */
+@Builder
+@AllArgsConstructor
+@NoArgsConstructor
 @Data
 @TableName("wms_ware_order_task_detail")
 public class WareOrderTaskDetailEntity implements Serializable {
@@ -47,7 +48,7 @@ public class WareOrderTaskDetailEntity implements Serializable {
 	 */
 	private Long wareId;
 	/**
-	 * 状态: 1-锁定 2-解锁 3-已扣减
+	 * 状态: 1-已锁定 2-已解锁 3-已扣减
 	 */
 	private Integer lockStatus;
 
@@ -57,11 +58,11 @@ public class WareOrderTaskDetailEntity implements Serializable {
 		/**
 		 * 1-锁定
 		 */
-		LOCKED(1, "锁定"),
+		LOCKED(1, "已锁定"),
 		/**
 		 * 2-解锁
 		 */
-		UNLOCK(2, "解锁"),
+		UNLOCK(2, "已解锁"),
 		/**
 		 * 3-已扣减
 		 */

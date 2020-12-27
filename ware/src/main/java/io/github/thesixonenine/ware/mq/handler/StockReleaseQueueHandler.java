@@ -55,7 +55,7 @@ public class StockReleaseQueueHandler {
         Long taskId = dto.getTaskId();
         // 查询工作单详情, 没有则证明锁定库存的事务已经回滚, 没有锁定任何库存, 无需解锁
         WareOrderTaskDetailEntity taskDetail = wareOrderTaskDetailService.getById(detailId);
-        if (Objects.isNull(taskDetail)) {
+        if (Objects.isNull(taskDetail) || !WareOrderTaskDetailEntity.LockStatusEnum.LOCKED.getCode().equals(taskDetail.getLockStatus())) {
             // 无需解锁
             channel.basicAck(message.getMessageProperties().getDeliveryTag(), false);
             return;

@@ -1,5 +1,6 @@
 package io.github.thesixonenine.ware.service.impl;
 
+import com.baomidou.mybatisplus.core.conditions.Wrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
@@ -106,6 +107,7 @@ public class WareSkuServiceImpl extends ServiceImpl<WareSkuDao, WareSkuEntity> i
 
     @Override
     public int unLockStock(StockLockedDTO dto) {
+        wareOrderTaskDetailService.updateById(WareOrderTaskDetailEntity.builder().id(dto.getDetailId()).lockStatus(WareOrderTaskDetailEntity.LockStatusEnum.UNLOCK.getCode()).build());
         return wareSkuDao.unLockStock(dto);
     }
 
